@@ -1,0 +1,22 @@
+{
+  "upstream": "https://puyo.sega.jp/program_2020/",
+  "mirror": "https://github.com/sity-games/sega-puyo",
+  "commit": "a6b28c3704065018dbe03fe10386994f700c4445",
+  "files": {
+    "puyo_1.png": "10cbedcb4e416889dd1d7b891bdced4159ed8d7ad24355c746687f17cf20795b",
+    "puyo_2.png": "80df711fb071a04aec0c095afb12d60065593f4bb0c46f236550c3dd0390a14b",
+    "puyo_3.png": "8fa3d5e2c3c14a3e5661189ca6223202f8eece0a74d999606fb73f5706ab7de7",
+    "puyo_4.png": "a8a19f471beac05dfa406121a93abc6a7e3b678ea8a464795e7ecabec0b12bdc",
+    "puyo_5.png": "42c8f927963bad6584131e407ddd752386048da81481031d9a8aaa4a36ef8abc",
+    "ojamaPuyo.png": "3f61bab06150943530547a58b7cad6071e772d98c7ed2ebec11a9844ab46324d",
+    "SEGA_License.txt": "052a08c79432ba6dedfd0f5dd12564803aed27eeb02c2edd312ee731081b2096"
+  },
+  "manifest": {
+    "1": "/official/puyo_4.png",
+    "2": "/official/puyo_1.png",
+    "3": "/official/puyo_2.png",
+    "4": "/official/puyo_5.png",
+    "5": "/official/puyo_3.png",
+    "6": "/official/ojamaPuyo.png"
+  }
+}
