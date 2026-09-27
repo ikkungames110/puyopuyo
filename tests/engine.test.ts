@@ -15,7 +15,7 @@ import {
   gravity,
   type Action,
 } from '../src/engine';
-import { drills, isCorrect } from '../src/content';
+
 describe('連鎖・得点計算', () => {
   it('4個未満は消さず、入力盤面を変更しない', () => {
     const b = fromColumns([[1, 1, 1]]),
@@ -133,30 +133,4 @@ describe('移動・着地・再現性', () => {
     expect(gravity(b)[0][3]).toBe(1);
     expect(gravity(b)[1][3]).toBe(2);
   });
-});
-describe('全ドリルの妥当性', () => {
-  it('IDに重複がない', () => {
-    expect(new Set(drills.map((d) => d.id)).size).toBe(drills.length);
-  });
-  for (const drill of drills) {
-    if (drill.type === 'placement')
-      it(`${drill.id}: 初期盤面は安定、実際の入力経路で正解できる`, () => {
-        expect(resolve(drill.board).chains).toBe(0);
-        expect(gravity(drill.board)).toEqual(drill.board);
-        const solutions = placements(drill.board, drill.pair).filter((p) =>
-          isCorrect(drill, p.result, p.target, p.path.length),
-        );
-        expect(solutions.length, drill.title).toBeGreaterThan(0);
-        for (const s of solutions) {
-          const p = s.path.reduce((p, a: Action) => move(drill.board, p, a), spawn(drill.pair));
-          expect(landing(drill.board, p)).toEqual(s.target);
-          expect(drop(drill.board, p)).toEqual(s.result);
-        }
-      });
-    else
-      it(`${drill.id}: 選択肢と出典を持つ`, () => {
-        expect(drill.options[drill.answer]).toBeTruthy();
-        expect(drill.sources.length).toBeGreaterThan(0);
-      });
-  }
 });

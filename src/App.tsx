@@ -17,21 +17,13 @@ import {
   ExternalLink,
   Search,
   RotateCcw,
-  Sparkles,
   Library,
   Upload,
 } from 'lucide-react';
 import Puyo, { AssetContext } from './Puyo';
 import Simulator, { SourceLinks } from './Simulator';
-import {
-  categories,
-  drills,
-  lessons,
-  sources,
-  type Category,
-  type Drill,
-  type QuizDrill,
-} from './content';
+import NextTrainer from './NextTrainer';
+import { categories, topics, drills, lessons, sources, type Category, type Drill } from './content';
 import { readProgress, saveProgress, localDay, streak, type Progress } from './storage';
 import { COLORS } from './engine';
 type Page = 'home' | 'drills' | 'simulator' | 'knowledge' | 'progress' | 'sources' | 'settings';
@@ -51,85 +43,6 @@ const titles: Record<Page, string> = {
   sources: '参考資料・クレジット',
   settings: '表示設定',
 };
-function Quiz({
-  drill,
-  onAttempt,
-  onNext,
-}: {
-  drill: QuizDrill;
-  onAttempt: (correct: boolean, seconds: number) => void;
-  onNext: () => void;
-}) {
-  const [choice, setChoice] = useState<number | null>(null),
-    [answered, setAnswered] = useState(false),
-    [hint, setHint] = useState(false),
-    [start] = useState(Date.now());
-  return (
-    <div className="quiz-layout">
-      <section className="quiz-card">
-        <div className="eyebrow">
-          <span className="number-chip">Q</span> THINK & LEARN
-        </div>
-        <div className="task-tags">
-          <span>{drill.category}</span>
-          <span>{drill.level}</span>
-        </div>
-        <h2>{drill.title}</h2>
-        <p className="question">{drill.question}</p>
-        <div className="quiz-options">
-          {drill.options.map((o, i) => (
-            <button
-              key={o}
-              className={`${choice === i ? 'chosen' : ''} ${answered && i === drill.answer ? 'right-answer' : ''} ${answered && choice === i && i !== drill.answer ? 'wrong-answer' : ''}`}
-              onClick={() => setChoice(i)}
-              disabled={answered}
-            >
-              <span>{String.fromCharCode(65 + i)}</span>
-              {o}
-              {answered && i === drill.answer && <Check size={19} />}
-            </button>
-          ))}
-        </div>
-        <button
-          className="primary"
-          disabled={choice === null || answered}
-          onClick={() => {
-            setAnswered(true);
-            onAttempt(choice === drill.answer, Math.round((Date.now() - start) / 1000));
-          }}
-        >
-          答え合わせする
-          <ArrowRight size={18} />
-        </button>
-        {answered && (
-          <div className={`quiz-feedback ${choice === drill.answer ? 'right' : ''}`} role="status">
-            <h3>
-              {choice === drill.answer
-                ? '正解！ 理解がひとつ深まりました。'
-                : '正解を確認してみよう。'}
-            </h3>
-            <p>{drill.explanation}</p>
-            <SourceLinks ids={drill.sources} />
-            <button className="primary" onClick={onNext}>
-              次の問題
-              <ArrowRight size={16} />
-            </button>
-          </div>
-        )}
-      </section>
-      <aside className="task-card quiz-aside">
-        <div className="big-asterisk">✳</div>
-        <h3>考え方を、身につける。</h3>
-        <p>知識は実際の盤面で使ってこそ。答えを確かめたら、シミュレーターでも試してみよう。</p>
-        <button className="hint-button" onClick={() => setHint(!hint)}>
-          <Sparkles size={16} />
-          ヒントをみる
-        </button>
-        {hint && <p className="hint-text">{drill.hint}</p>}
-      </aside>
-    </div>
-  );
-}
 function loadAssets(): Record<number, string> {
   try {
     const v = JSON.parse(localStorage.getItem('puyolab-assets') || '{}');
@@ -149,9 +62,15 @@ export default function App() {
   const [page, setPage] = useState<Page>('home');
   const [active, setActive] = useState<Drill | null>(null);
   const [category, setCategory] = useState<Category>('すべて');
+  const [topic, setTopic] = useState('すべて');
+  const [difficulty, setDifficulty] = useState('すべて');
+  const [turnCount, setTurnCount] = useState('すべて');
   const [search, setSearch] = useState('');
   const [reviewOnly, setReviewOnly] = useState(false);
-  const [progress, setProgress] = useState<Progress>(readProgress);
+  const [progress, setProgress] = useState<Progress>(() => {
+    const p = readProgress();
+    return { ...p, attempts: p.attempts.filter((a) => drills.some((d) => d.id === a.id)) };
+  });
   const [assets, setAssets] = useState<Record<number, string>>(loadAssets);
   const [defaultAssets, setDefaultAssets] = useState<Record<number, string>>({});
   useEffect(() => {
@@ -188,7 +107,7 @@ export default function App() {
         (progress.attempts.filter((a) => a.correct).length / progress.attempts.length) * 100,
       )
     : 0;
-  const featured = drills.find((d) => d.id === 'stairs-3')!;
+  const featured = drills.find((d) => d.id === 'next-piro-1-2')!;
   const current = active ?? featured;
   function go(p: Page) {
     setPage(p);
@@ -237,22 +156,24 @@ export default function App() {
   }
   const filtered = drills.filter(
     (d) =>
-      (category === 'すべて' || d.category === category) &&
+      (category === 'すべて' || category === '次の一手' || d.category === category) &&
       (!reviewOnly || review.has(d.id)) &&
-      `${d.title}${d.description}`.includes(search),
+      (topic === 'すべて' || d.topic === topic) &&
+      (difficulty === 'すべて' || d.level === difficulty) &&
+      (turnCount === 'すべて' || d.queue.length === Number(turnCount)) &&
+      `${d.title}${d.description}${d.topic}${d.sources.map((id) => sources.find((s) => s.id === id)?.author).join(' ')}`.includes(
+        search,
+      ),
   );
-  const renderPractice = (d: Drill) =>
-    d.type === 'placement' ? (
-      <Simulator
-        key={`${d.id}-${session}`}
-        drill={d}
-        onAttempt={attempt}
-        onBest={best}
-        onNext={next}
-      />
-    ) : (
-      <Quiz key={`${d.id}-${session}`} drill={d} onAttempt={attempt} onNext={next} />
-    );
+  const renderPractice = (d: Drill) => (
+    <NextTrainer
+      key={`${d.id}-${session}`}
+      drill={d}
+      onAttempt={attempt}
+      onBest={best}
+      onNext={next}
+    />
+  );
   return (
     <AssetContext.Provider value={{ ...defaultAssets, ...assets }}>
       <div className="app-shell">
@@ -353,7 +274,7 @@ export default function App() {
                     <p>
                       考えて、置いて、わかる。
                       <br className="mobile-only" />
-                      毎日の小さな練習を、確かな力に。
+                      連鎖尾・折り返し・催促を、72の盤面で。
                     </p>
                     <div className="banner-tags">
                       <span>
@@ -433,7 +354,7 @@ export default function App() {
                   <div>
                     <span className="small-kicker">DAILY PRACTICE</span>
                     <h2>
-                      今日の一問<span className="pill">まずはここから</span>
+                      今日の一問<span className="pill">NEXTを読んで組む</span>
                     </h2>
                   </div>
                   <button className="text-link" onClick={() => go('drills')}>
@@ -450,13 +371,16 @@ export default function App() {
                 </div>
                 <div className="focus-grid">
                   {categories.slice(1).map((c, i) => {
-                    const Icon = [Layers3, Zap, Target, Gamepad2][i];
+                    const Icon = [Layers3, Target, Gamepad2][i];
                     return (
                       <button
                         key={c}
                         className={`focus-card focus-${i}`}
                         onClick={() => {
                           setCategory(c);
+                          setTopic('すべて');
+                          setDifficulty('すべて');
+                          setTurnCount('すべて');
                           setReviewOnly(false);
                           go('drills');
                         }}
@@ -469,15 +393,14 @@ export default function App() {
                         <p>
                           {
                             [
-                              '一手先を考える、配置の練習。',
-                              '消える順番から、形を理解する。',
-                              '小さな攻撃と、状況を読む力。',
-                              '迷いのない、正確な操作へ。',
+                              '1〜3手先まで読む、接続の実戦ドリル。',
+                              '短い攻撃を撃ち、本線を残す配置。',
+                              'ちぎらずに、接続を完成させる手順。',
                             ][i]
                           }
                         </p>
                         <div>
-                          {drills.filter((d) => d.category === c).length} ドリル
+                          {drills.filter((d) => c === '次の一手' || d.category === c).length} ドリル
                           <ArrowUpRight size={20} />
                         </div>
                       </button>
@@ -504,8 +427,11 @@ export default function App() {
                 <>
                   <div className="page-heading">
                     <span className="small-kicker">PRACTICE LIBRARY</span>
-                    <h1>小さな練習、大きな一歩。</h1>
-                    <p>{drills.length}問のドリルで、配置・連鎖・対戦判断・操作を少しずつ。</p>
+                    <h1>次の一手を、深く読む。</h1>
+                    <p>
+                      {drills.length}問・{topics.length}
+                      テーマ。NEXT構築、催促の残し、ちぎり回避を盤面で回答。
+                    </p>
                   </div>
                   <div className="filter-bar">
                     <div className="filter-tabs">
@@ -528,6 +454,51 @@ export default function App() {
                       />
                     </label>
                   </div>
+                  <div className="advanced-filters">
+                    <label>
+                      テーマ
+                      <select
+                        aria-label="テーマ"
+                        value={topic}
+                        onChange={(e) => setTopic(e.target.value)}
+                      >
+                        <option>すべて</option>
+                        {topics.map((t) => (
+                          <option key={t}>{t}</option>
+                        ))}
+                      </select>
+                    </label>
+                    <label>
+                      難易度
+                      <select
+                        aria-label="難易度"
+                        value={difficulty}
+                        onChange={(e) => setDifficulty(e.target.value)}
+                      >
+                        <option>すべて</option>
+                        <option>中級</option>
+                        <option>上級</option>
+                      </select>
+                    </label>
+                    <label>
+                      構築手数
+                      <select
+                        aria-label="構築手数"
+                        value={turnCount}
+                        onChange={(e) => setTurnCount(e.target.value)}
+                      >
+                        <option>すべて</option>
+                        {[1, 2, 3].map((n) => (
+                          <option key={n} value={n}>
+                            {n}手
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+                  <div className="research-summary">
+                    8つの攻略サイト・21記事を参照。完成例から作成した派生課題と独自の催促課題です。各問題に元記事と問題化の内容を記載しています。
+                  </div>
                   <div className="list-meta">
                     <span>{filtered.length} 件のドリル</span>
                     <label>
@@ -544,11 +515,7 @@ export default function App() {
                       <button className="drill-card" key={d.id} onClick={() => openDrill(d)}>
                         <div className="drill-card-top">
                           <span className={`type-icon ${d.type}`}>
-                            {d.type === 'placement' ? (
-                              <Gamepad2 size={23} />
-                            ) : (
-                              <BookOpen size={23} />
-                            )}
+                            <Gamepad2 size={23} />
                           </span>
                           <span className="drill-index">{String(i + 1).padStart(2, '0')}</span>
                           {mastered.has(d.id) && (
@@ -559,14 +526,44 @@ export default function App() {
                           )}
                         </div>
                         <div className="task-tags">
-                          <span>{d.category}</span>
+                          <span>{d.topic}</span>
                           <span className="level">{d.level}</span>
+                        </div>
+                        <div className="drill-preview" aria-hidden="true">
+                          <div className="mini-field">
+                            {d.board
+                              .slice(0, 12)
+                              .reverse()
+                              .flatMap((row, y) =>
+                                row.map((c, x) => (
+                                  <span key={`${x}-${y}`} className={`mini-cell color-${c}`} />
+                                )),
+                              )}
+                          </div>
+                          <div className="preview-queue">
+                            <span>{d.queue.length}手で構築</span>
+                            <div>
+                              {d.queue.map((p, i) => (
+                                <span key={i} className="preview-pair">
+                                  <Puyo color={p[1]} />
+                                  <Puyo color={p[0]} />
+                                </span>
+                              ))}
+                            </div>
+                            <small>
+                              {d.attack ? '攻撃後に' : ''}
+                              {d.minChains}連鎖以上{d.noSplit ? ' · ちぎり0' : ''}
+                            </small>
+                          </div>
                         </div>
                         <h3>{d.title}</h3>
                         <p>{d.description}</p>
                         <div className="drill-card-bottom">
                           <span>
-                            {d.type === 'placement' ? '実際に置いて回答' : '選択式クイズ'}
+                            {sources
+                              .find((s) => s.id === d.sources[0])
+                              ?.author.split(' / ')
+                              .at(-1)}
                           </span>
                           <ArrowRight size={19} />
                         </div>
@@ -586,6 +583,9 @@ export default function App() {
                           setReviewOnly(false);
                           setCategory('すべて');
                           setSearch('');
+                          setTopic('すべて');
+                          setDifficulty('すべて');
+                          setTurnCount('すべて');
                         }}
                       >
                         すべて表示
@@ -623,6 +623,9 @@ export default function App() {
                         className="text-link"
                         onClick={() => {
                           setCategory(l.tag as Category);
+                          setTopic('すべて');
+                          setDifficulty('すべて');
+                          setTurnCount('すべて');
                           setReviewOnly(false);
                           go('drills');
                         }}
@@ -636,7 +639,7 @@ export default function App() {
                 <div className="small-note wide">
                   <BookOpen />
                   <p>
-                    問題の盤面・選択肢・解説は本サイト用に作成しました。参考先の図や問題の転載ではありません。対戦判断は状況依存のため、問題に書かれた条件での推奨を答えとしています。
+                    構築問題は参照記事の連鎖形から配ぷよ・不足する接続・達成条件を設定した派生課題です。元記事の解説画像は収録していません。催促問題は残しまで評価する本サイト独自の条件で、対戦全体の最善手を保証するものではありません。
                   </p>
                 </div>
               </>
@@ -705,6 +708,10 @@ export default function App() {
                     className="text-link"
                     onClick={() => {
                       setReviewOnly(true);
+                      setTopic('すべて');
+                      setDifficulty('すべて');
+                      setTurnCount('すべて');
+                      setSearch('');
                       setCategory('すべて');
                       go('drills');
                     }}
@@ -715,7 +722,7 @@ export default function App() {
                 </div>
                 <div className="category-progress">
                   {categories.slice(1).map((c) => {
-                    const all = drills.filter((d) => d.category === c),
+                    const all = drills.filter((d) => c === '次の一手' || d.category === c),
                       count = all.filter((d) => mastered.has(d.id)).length;
                     return (
                       <div key={c}>
