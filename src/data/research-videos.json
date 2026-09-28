@@ -1,0 +1,215 @@
+[
+  {
+    "id": "OhlgW42vPo8",
+    "title": "【初心者向け】誰でも10連鎖出来るようになるぷよぷよ講座【GTR/かぎ積み/ぷよぷよeスポーツ/ゆっくり解説/ゆっくり実況】",
+    "author": "yellowbird-きとりch-",
+    "url": "https://www.youtube.com/watch?v=OhlgW42vPo8",
+    "views": 1251411,
+    "duration": 474,
+    "published": "20200516",
+    "checkedAt": "2026-09-28",
+    "downloaded": true,
+    "sha256": "e37a3ff159c65cb88bdc166862ee80d7b2377fe93f570f5673b3dc4559814e50",
+    "bytes": 9705138,
+    "analysisMethod": "ダウンロードした動画の日本語自動字幕と抽出フレームを照合。全編を実時間で通し視聴したものではない。",
+    "segments": [
+      {
+        "title": "GTRを長くする入口",
+        "seconds": 319,
+        "summary": "折り返しの上で別の色を挟み、発火点を延ばす。土台全体を毎回作り直さず、前半と後半を別々に練習する。",
+        "topics": [
+          "GTRの接続",
+          "折り返し後の伸ばし"
+        ]
+      },
+      {
+        "title": "かぎ積みとの接続",
+        "seconds": 358,
+        "summary": "GTRの入口に上段の接続を足す考え方を、欠けた接続を補う課題に応用する。",
+        "topics": [
+          "折り返し後の伸ばし"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "-3lJeLp7ApQ",
+    "title": "【初級者向け】GTRの連鎖尾部分を徹底解説",
+    "author": "momoken",
+    "url": "https://www.youtube.com/watch?v=-3lJeLp7ApQ",
+    "views": 135892,
+    "duration": 1138,
+    "published": "20230407",
+    "checkedAt": "2026-09-28",
+    "downloaded": true,
+    "sha256": "c661e3124bac55c8248e56059d0857bf040c888c58a0af91a6da451bf13111a5",
+    "bytes": 39347464,
+    "analysisMethod": "ダウンロードした動画の日本語自動字幕と抽出フレームを照合。全編を実時間で通し視聴したものではない。",
+    "segments": [
+      {
+        "title": "連鎖尾の外側を使う",
+        "seconds": 94,
+        "summary": "余分な連結を置く位置を比べる。6列目と5列目の高さが後からそろう形は、次の雪崩を載せやすい。",
+        "topics": [
+          "雪崩・段差",
+          "連鎖尾の回収"
+        ]
+      },
+      {
+        "title": "深い溝を作らない",
+        "seconds": 265,
+        "summary": "連鎖尾を高くするだけでは次の色を受けづらくなる。外側の谷へ必要色を運べるかを一手先まで確認する。",
+        "topics": [
+          "連鎖尾の手順"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "aRsLjITw1nc",
+    "title": "【前編】ぷよぷよ初心者に分かりやすいGTR講座作りました。｜簡単な基礎知識",
+    "author": "なもこ -Namoco-",
+    "url": "https://www.youtube.com/watch?v=aRsLjITw1nc",
+    "views": 106398,
+    "duration": 619,
+    "published": "20210302",
+    "checkedAt": "2026-09-28",
+    "downloaded": true,
+    "sha256": "535a0a6140cd85c0b19841e3286fbdc92c93a7a9c14821e6254654cf55d5da6c",
+    "bytes": 7608022,
+    "analysisMethod": "ダウンロードした動画の日本語自動字幕と抽出フレームを照合。全編を実時間で通し視聴したものではない。",
+    "segments": [
+      {
+        "title": "初手を色の関係で分類",
+        "seconds": 241,
+        "summary": "A・B・Cは実際の色名ではなく登場した色の関係を表す。ゾロと混色の置き方を分類し、折り返しの入口を残す。",
+        "topics": [
+          "GTRの接続"
+        ]
+      },
+      {
+        "title": "AA ABの受け入れ",
+        "seconds": 510,
+        "summary": "同色が3個ある初手でも、すぐ4個消しにせずGTRの下部と後続色の場所を作る。",
+        "topics": [
+          "GTR接続・折り返し"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "uvblsdeVOvY",
+    "title": "momoken流「多重折返し」講座",
+    "author": "momoken",
+    "url": "https://www.youtube.com/watch?v=uvblsdeVOvY",
+    "views": 80251,
+    "duration": 2184,
+    "published": "20201202",
+    "checkedAt": "2026-09-28",
+    "downloaded": true,
+    "sha256": "44a1defb55505032384f8743bf9adcdb23123e700ecb5f3ba50d22378d549cf1",
+    "bytes": 112265518,
+    "analysisMethod": "ダウンロードした動画の日本語自動字幕と抽出フレームを照合。全編を実時間で通し視聴したものではない。",
+    "segments": [
+      {
+        "title": "座布団型",
+        "seconds": 243,
+        "summary": "横3を折り返しの上で連結する。予約した色の位置と、下段へ渡すキーの落下順を別々に確認する。",
+        "topics": [
+          "多重・座布団"
+        ]
+      },
+      {
+        "title": "L字型",
+        "seconds": 290,
+        "summary": "横3以外にもL字を使って上へ伸ばせる。左右のL字が同時に消えないように接続を補う。",
+        "topics": [
+          "多重・L字"
+        ]
+      },
+      {
+        "title": "座布団とL字の複合",
+        "seconds": 340,
+        "summary": "横3の足場の上へL字を載せる。土台の上で選べる色を増やしつつ、接続が途切れないことを確認する。",
+        "topics": [
+          "多重・複合"
+        ]
+      },
+      {
+        "title": "発火点を組み替える",
+        "seconds": 867,
+        "summary": "既存の発火点を別色へ移すと、折り返し上の空間を使える場合がある。形を確定してからの延長も比較する。",
+        "topics": [
+          "発火点の組み替え"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "DNtHSfjZ4cc",
+    "title": "ワンランク上の連鎖尾講座【中～上級者向け】",
+    "author": "momoken",
+    "url": "https://www.youtube.com/watch?v=DNtHSfjZ4cc",
+    "views": 58345,
+    "duration": 1578,
+    "published": "20201231",
+    "checkedAt": "2026-09-28",
+    "downloaded": true,
+    "sha256": "dcd294fa73b588177060e30dfc32696a89cc31bdea7ff770b7cf698a72ea1d87",
+    "bytes": 41687936,
+    "analysisMethod": "ダウンロードした動画の日本語自動字幕と抽出フレームを照合。全編を実時間で通し視聴したものではない。",
+    "segments": [
+      {
+        "title": "潜り込みの目的",
+        "seconds": 11,
+        "summary": "雪崩を置きにくい配色で、下に残った色へ戻って接続する。連鎖尾の選択肢とちぎり回避を同時に増やす。",
+        "topics": [
+          "鶴亀・潜り込み",
+          "潜り込み・斉藤SP"
+        ]
+      },
+      {
+        "title": "下段へ戻る連鎖尾",
+        "seconds": 126,
+        "summary": "見えている上側だけでなく、落下後に再び使う下の色を追う。連鎖尾の高さと折り返しの高さを合わせる。",
+        "topics": [
+          "鶴亀・潜り込み"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "VSMX52gpB8U",
+    "title": "GTRで、1手ごとに考えていることをすべて解説 │delta 【ぷよぷよ】",
+    "author": "delta CHANNEL",
+    "url": "https://www.youtube.com/watch?v=VSMX52gpB8U",
+    "views": 44578,
+    "duration": 1836,
+    "published": "20210926",
+    "checkedAt": "2026-09-28",
+    "downloaded": true,
+    "sha256": "8f78758dc8cd5b9649f1ccc0836a4f5797f66f2b9116aa21c801de3f75d13046",
+    "bytes": 28326961,
+    "analysisMethod": "ダウンロードした動画の日本語自動字幕と抽出フレームを照合。全編を実時間で通し視聴したものではない。",
+    "segments": [
+      {
+        "title": "折り返しと連鎖尾の並行構築",
+        "seconds": 499,
+        "summary": "混色ツモを盤面の役割に分ける。連鎖尾と折り返しを同時期に完成させるため、次のツモが必要な場所を空ける。",
+        "topics": [
+          "後折りのツモ判断",
+          "連鎖尾の手順"
+        ]
+      },
+      {
+        "title": "外側の残りを回収",
+        "seconds": 1647,
+        "summary": "外側に置いた色を最後の連結へ回収する。盤面の高さだけでなく最後まで残る色の消去順を確認する。",
+        "topics": [
+          "余りぷよの回収",
+          "連鎖尾の回収"
+        ]
+      }
+    ]
+  }
+]

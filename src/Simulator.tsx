@@ -14,11 +14,12 @@ import {
   Pencil,
   Download,
   Upload,
-  Pause,
   ArrowDown,
   Eye,
 } from 'lucide-react';
 import Board from './Board';
+import useGameControls from './useGameControls';
+import ControllerPanel from './ControllerPanel';
 import Puyo from './Puyo';
 import {
   cloneBoard,
@@ -62,21 +63,31 @@ export function SourceLinks({ ids }: { ids: string[] }) {
 type Snapshot = { board: BoardType; index: number; score: number; last: Resolution | null };
 export default function Simulator({
   drill,
+  initial,
   onAttempt,
   onBest,
   onNext,
 }: {
   drill?: PlacementDrill;
+  initial?: { board: BoardType; pair: Pair; title: string };
   onAttempt: (correct: boolean, seconds: number) => void;
   onBest: (chain: number) => void;
   onNext?: () => void;
 }) {
-  const [board, setBoard] = useState<BoardType>(() => cloneBoard(drill?.board ?? emptyBoard()));
+  const [board, setBoard] = useState<BoardType>(() =>
+    cloneBoard(drill?.board ?? initial?.board ?? emptyBoard()),
+  );
   const [queue, setQueue] = useState<Pair[]>(() =>
-    drill ? [drill.pair, ...randomPairs()] : randomPairs(),
+    drill
+      ? [drill.pair, ...randomPairs()]
+      : initial
+        ? [initial.pair, ...randomPairs()]
+        : randomPairs(),
   );
   const [index, setIndex] = useState(0);
-  const [piece, setPiece] = useState<Piece | null>(() => spawn(drill?.pair ?? [1, 3]));
+  const [piece, setPiece] = useState<Piece | null>(() =>
+    spawn(drill?.pair ?? initial?.pair ?? [1, 3]),
+  );
   const [history, setHistory] = useState<Snapshot[]>([]);
   const [score, setScore] = useState(0);
   const [last, setLast] = useState<Resolution | null>(null);
@@ -90,7 +101,6 @@ export default function Simulator({
     inputs: number;
   } | null>(null);
   const [hint, setHint] = useState(false);
-  const [auto, setAuto] = useState(false);
   const [speed, setSpeed] = useState(700);
   const [editing, setEditing] = useState(false);
   const [brush, setBrush] = useState<Color>(1);
@@ -109,7 +119,8 @@ export default function Simulator({
       generation.current++;
     };
   }, []); // queue is fixed for this mounted exercise
-  function reset(newBoard = drill?.board ?? emptyBoard(), newQueue = queue) {
+  function reset(newBoard = drill?.board ?? initial?.board ?? emptyBoard(), newQueue = queue) {
+    grounded.current = null;
     generation.current++;
     busyRef.current = false;
     setBusy(false);
@@ -126,7 +137,6 @@ export default function Simulator({
     setFeedback(null);
     setPreview(null);
     setNotice('');
-    setAuto(false);
     setEditing(false);
     started.current = Date.now();
   }
@@ -158,11 +168,11 @@ export default function Simulator({
   }
   function commit(p = piece, example = false, inputPath = inputs) {
     if (!p || busyRef.current || editing || (feedback && !example)) return;
+    grounded.current = null;
     const target = landing(board, p),
       result = drop(board, p);
     if (!result) return;
     setHistory((h) => [...h, { board: cloneBoard(board), index, score, last }]);
-    setAuto(drill ? false : auto);
     void animate(result, () => {
       setScore(score + result.score);
       onBest(result.chains);
@@ -179,26 +189,39 @@ export default function Simulator({
         const next = spawn(nextQueue[nextIndex]);
         if (gameOver(result.board) || !fits(result.board, next)) {
           setPiece(null);
-          setAuto(false);
           setNotice('ゲームオーバー。1手戻して考え直すか、リセットで再開できます。');
         } else setPiece(next);
       }
     });
   }
+  const grounded = useRef<number | null>(null);
+  const rotationTime = useRef(0);
   function act(action: Action) {
     if (!piece || busyRef.current || editing || feedback || preview !== null) return;
-    const next = move(board, piece, action);
+    const now = performance.now();
+    const rotating = action === 'cw' || action === 'ccw';
+    const origin =
+      piece.quick && now - rotationTime.current > 300 ? { ...piece, quick: undefined } : piece;
+    const next = move(board, origin, action);
+    if (rotating) rotationTime.current = now;
     const nextInputs = [...inputs, action];
     setInputs(nextInputs);
-    if (action === 'down' && next === piece) commit(piece, false, nextInputs);
-    else setPiece(next);
+    if (action === 'down' && next.y === piece.y) {
+      grounded.current ??= now;
+      if (now - grounded.current >= 250) {
+        grounded.current = null;
+        commit(piece, false, nextInputs);
+      }
+    } else {
+      if (next !== piece) grounded.current = null;
+      setPiece(next);
+    }
   }
   function playEditedBoard() {
     if (busyRef.current || drill) return;
     const before = gravity(board);
     setHistory((h) => [...h, { board: cloneBoard(before), index, score, last }]);
     setEditing(false);
-    setAuto(false);
     setNotice('');
     const result = resolve(before);
     void animate(result, () => {
@@ -209,6 +232,7 @@ export default function Simulator({
   }
   function undo() {
     if (!history.length || busyRef.current) return;
+    grounded.current = null;
     const h = history[history.length - 1];
     generation.current++;
     setBoard(h.board);
@@ -221,53 +245,24 @@ export default function Simulator({
     setFeedback(null);
     setPreview(null);
     setNotice('');
-    setAuto(false);
   }
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (
-        (e.target as HTMLElement).matches('input,textarea,select') ||
-        e.ctrlKey ||
-        e.metaKey ||
-        e.altKey
-      )
-        return;
-      const map: Record<string, Action> = {
-        ArrowLeft: 'left',
-        ArrowRight: 'right',
-        ArrowDown: 'down',
-        z: 'ccw',
-        Z: 'ccw',
-        x: 'cw',
-        X: 'cw',
-        ArrowUp: 'cw',
-      };
-      if (map[e.key]) {
-        e.preventDefault();
-        if (!e.repeat || ['ArrowLeft', 'ArrowRight', 'ArrowDown'].includes(e.key)) act(map[e.key]);
-      }
-      if (e.code === 'Space' && !e.repeat) {
-        e.preventDefault();
-        if (preview === null) commit();
-      }
-      if ((e.key === 'u' || e.key === 'U') && !e.repeat) {
-        e.preventDefault();
+  const controls = useGameControls(
+    (command) => {
+      if (command === 'undo') {
         undo();
+        return;
       }
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  });
-  useEffect(() => {
-    if (!auto || busy || editing || !piece || feedback || preview !== null) return;
-    const timer = window.setInterval(() => {
-      if (document.hidden) return;
-      const next = move(board, piece, 'down');
-      if (next === piece) commit();
-      else setPiece(next);
-    }, 600);
-    return () => clearInterval(timer);
-  });
+      if (command === 'answer') return;
+      if (command === 'drop') {
+        if (preview === null) commit();
+        return;
+      }
+      act(command);
+    },
+    () => {
+      grounded.current = null;
+    },
+  );
   const solutions = useMemo(
     () =>
       drill
@@ -337,10 +332,10 @@ export default function Simulator({
       <section className="play-card">
         <div className="play-toolbar">
           <span className="live-dot" />
-          <strong>{drill ? '考えて、置いてみよう' : 'フリーシミュレーター'}</strong>
-          <span className="toolbar-tag">
-            {editing ? '盤面編集' : auto ? '自動落下 ON' : 'じっくりモード'}
-          </span>
+          <strong>
+            {drill ? '考えて、置いてみよう' : (initial?.title ?? 'フリーシミュレーター')}
+          </strong>
+          <span className="toolbar-tag">{editing ? '盤面編集' : '自動落下なし'}</span>
         </div>
         <div className="field-area">
           <div className="field-side left-side">
@@ -468,6 +463,7 @@ export default function Simulator({
             </button>
           </div>
         </div>
+        <ControllerPanel controls={controls} />
         {notice && (
           <p role="status" className="inline-notice">
             {notice}
@@ -480,13 +476,6 @@ export default function Simulator({
               盤面の連鎖を再生
             </button>
             <button
-              className={auto ? 'selected' : ''}
-              disabled={editing || busy || !piece}
-              onClick={() => setAuto(!auto)}
-            >
-              {auto ? <Pause size={16} /> : <Play size={16} />}自動落下
-            </button>
-            <button
               className={editing ? 'selected' : ''}
               disabled={busy}
               onClick={() => {
@@ -496,7 +485,6 @@ export default function Simulator({
                   setPiece(fits(settled, spawn(queue[index])) ? spawn(queue[index]) : null);
                 }
                 setEditing(!editing);
-                setAuto(false);
                 setPreview(null);
               }}
             >
@@ -699,7 +687,7 @@ export default function Simulator({
               <div>
                 <strong>じっくり考えるための設定</strong>
                 <p>
-                  自動落下は初期状態でOFF。Spaceの即設置は練習用の機能です。実機のフレーム単位の操作・クイックターンは再現していません。
+                  自動落下はありません。下入力を続けて接地すると確定します。Spaceの即設置は練習用の機能です。コントローラーのボタン配置・長押し速度は盤面下で調整できます。
                 </p>
               </div>
             </section>
@@ -718,7 +706,6 @@ export default function Simulator({
                   key={i}
                   onClick={() => {
                     setPreview(preview === i ? null : i);
-                    setAuto(false);
                   }}
                 >
                   <span className="step-number">{i + 1}</span>

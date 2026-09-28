@@ -1,7 +1,7 @@
 export type Color = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 export type Board = Color[][];
 export type Pair = [Color, Color];
-export type Piece = { x: number; y: number; r: number; pair: Pair };
+export type Piece = { x: number; y: number; r: number; pair: Pair; quick?: 'cw' | 'ccw' };
 export type Action = 'left' | 'right' | 'cw' | 'ccw' | 'down';
 export type Cell = { x: number; y: number; color: Color };
 export type ChainStep = {
@@ -48,13 +48,19 @@ export function move(b: Board, p: Piece, a: Action): Piece {
   if (a === 'left' || a === 'right' || a === 'down') {
     const next = {
       ...p,
+      quick: undefined,
       x: p.x + (a === 'left' ? -1 : a === 'right' ? 1 : 0),
       y: p.y - (a === 'down' ? 1 : 0),
     };
     return fits(b, next) ? next : p;
   }
-  const next = { ...p, r: (p.r + (a === 'cw' ? 1 : 3)) % 4 };
-  // Basic wall/floor kicks. Quick turn and product-specific frame timings are not emulated.
+  const next = { ...p, quick: undefined, r: (p.r + (a === 'cw' ? 1 : 3)) % 4 };
+  // A narrow vertical shaft permits a two-press 180° swap without passing through the walls.
+  if (p.r % 2 === 0 && p.quick === a) {
+    const turned = { ...p, quick: undefined, y: p.y + (p.r === 0 ? 1 : -1), r: (p.r + 2) % 4 };
+    if (fits(b, turned)) return turned;
+  }
+  // Basic wall/floor kicks. Product-specific frame timings are not emulated.
   for (const [dx, dy] of [
     [0, 0],
     [next.r === 1 ? -1 : 1, 0],
@@ -63,6 +69,8 @@ export function move(b: Board, p: Piece, a: Action): Piece {
     const kicked = { ...next, x: next.x + dx, y: next.y + dy };
     if (fits(b, kicked)) return kicked;
   }
+  if (p.r % 2 === 0 && !fits(b, { ...p, r: 1 }) && !fits(b, { ...p, r: 3 }))
+    return p.quick === a ? p : { ...p, quick: a };
   return p;
 }
 export function gravity(b: Board): Board {
@@ -208,7 +216,7 @@ export function placements(board: Board, pair: Pair) {
   >();
   for (let i = 0; i < queue.length; i++) {
     const { piece, path } = queue[i];
-    const key = `${piece.x},${piece.y},${piece.r}`;
+    const key = `${piece.x},${piece.y},${piece.r},${piece.quick ?? ''}`;
     if (visited.has(key)) continue;
     visited.add(key);
     const target = landing(board, piece);

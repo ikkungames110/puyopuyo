@@ -3341,3 +3341,242 @@ main {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+.controller-panel {
+  margin: 12px 0;
+  border: 1px solid var(--line, #e6e9e4);
+  border-radius: 12px;
+  background: #f7f9f5;
+  font-size: 12px;
+  text-align: left;
+  min-width: 0;
+}
+.controller-panel summary {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  font-weight: 700;
+}
+.controller-panel summary span {
+  margin-left: auto;
+  color: #52735b;
+  font-size: 11px;
+}
+.controller-settings {
+  padding: 0 14px 14px;
+  display: grid;
+  gap: 12px;
+}
+.controller-settings p {
+  margin: 0;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.controller-settings label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.controller-settings select {
+  width: 100%;
+  min-width: 0;
+  padding: 7px;
+  border: 1px solid #dce3d8;
+  border-radius: 7px;
+  background: white;
+  color: #303e33;
+}
+.controller-mapping {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.controller-timing {
+  display: grid;
+  gap: 12px;
+}
+.controller-settings input {
+  width: 100%;
+  accent-color: #4a7055;
+}
+.pad-monitor {
+  padding: 8px;
+  border-radius: 6px;
+  background: #e9efe5;
+}
+.controller-settings small {
+  line-height: 1.8;
+  color: #657366;
+}
+.study-intro {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #edf3e8;
+  color: #466047;
+  border-radius: 14px;
+  padding: 16px 22px;
+  margin-bottom: 24px;
+}
+.study-intro svg {
+  flex-shrink: 0;
+}
+.study-intro p {
+  margin: 0;
+  line-height: 1.9;
+  font-size: 13px;
+}
+.study-filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 24px;
+  font-size: 13px;
+}
+.study-filters label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.study-filters select {
+  padding: 9px;
+  border: 1px solid #dce3d8;
+  border-radius: 8px;
+  background: white;
+}
+.study-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+.study-card {
+  min-width: 0;
+  padding: 26px;
+  background: white;
+  border: 1px solid #e4e9df;
+  border-radius: 16px;
+}
+.study-card h2 {
+  font-size: 19px;
+  line-height: 1.6;
+  margin: 16px 0 12px;
+}
+.study-card p,
+.study-card li {
+  font-size: 13px;
+  line-height: 1.95;
+}
+.study-card ol {
+  padding-left: 22px;
+  color: #476448;
+}
+.study-mistake {
+  background: #faf5e9;
+  border-radius: 9px;
+  padding: 12px;
+}
+.study-mistake strong {
+  display: block;
+  font-size: 11px;
+  color: #9a7740;
+}
+.study-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+.study-open {
+  grid-column: 1 / -1;
+}
+.study-seed {
+  margin-top: 24px;
+  border-top: 1px solid #e4e9df;
+  padding-top: 24px;
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 28px;
+}
+.study-seed .board-wrap {
+  width: 200px;
+}
+.study-seed-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: flex-start;
+}
+.study-seed-detail input {
+  width: 100%;
+  accent-color: #50765a;
+}
+.study-seed-detail small {
+  color: #6e7a6e;
+  line-height: 1.9;
+}
+.study-step-buttons {
+  display: flex;
+  gap: 10px;
+}
+.research-videos {
+  margin-bottom: 36px;
+}
+.research-videos > p {
+  font-size: 13px;
+  line-height: 2;
+}
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin: 22px 0;
+}
+.video-grid article {
+  background: white;
+  border: 1px solid #e3e8df;
+  border-radius: 14px;
+  padding: 22px;
+  min-width: 0;
+}
+.video-grid small {
+  font-size: 11px;
+  color: #667862;
+}
+.video-grid h3 {
+  font-size: 15px;
+  line-height: 1.8;
+}
+.video-grid p {
+  font-size: 12px;
+  line-height: 1.9;
+}
+.video-grid a {
+  color: #486953;
+}
+@media (max-width: 700px) {
+  .study-grid,
+  .video-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .study-card {
+    padding: 20px;
+  }
+  .study-seed {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+  .study-seed .board-wrap {
+    margin: auto;
+  }
+  .study-filters {
+    gap: 12px;
+  }
+  .study-filters .search-field {
+    width: 100%;
+    min-width: 0;
+  }
+}

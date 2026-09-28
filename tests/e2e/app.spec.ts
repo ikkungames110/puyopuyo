@@ -36,7 +36,7 @@ test('3手のNEXT構築を実操作して8連鎖検証、記録を永続化す�
   await page.getByRole('button', { name: '練習のきろく', exact: true }).click();
   await expect(page.locator('.history-list')).toContainText(featured.title);
   await page.reload();
-  await expect(page.locator('.stat-row')).toContainText('1 / 72');
+  await expect(page.locator('.stat-row')).toContainText(`1 / ${drills.length}`);
   expect(errors).toEqual([]);
 });
 test('解答例は記録せず、手順のコマ送りと再生中の画面切替ができる', async ({ page }) => {
@@ -56,10 +56,10 @@ test('解答例は記録せず、手順のコマ送りと再生中の画面切�
   await page.getByRole('button', { name: 'シミュレーター', exact: true }).click();
   await expect(page.locator('.board .puyo')).toHaveCount(3);
 });
-test('72問の検索・テーマ・難易度・手数・催促フィルター', async ({ page }) => {
+test('問題集の検索・テーマ・難易度・手数・催促フィルター', async ({ page }) => {
   await page.goto('/');
   await library(page);
-  await expect(page.locator('.drill-card')).toHaveCount(72);
+  await expect(page.locator('.drill-card')).toHaveCount(drills.length);
   await expect(page.locator('.drill-card')).not.toContainText(['はじめの4個消し']);
   await page.getByLabel('テーマ', { exact: true }).selectOption('潜り込み・斉藤SP');
   await expect(page.locator('.drill-card')).toHaveCount(8);
@@ -68,7 +68,9 @@ test('72問の検索・テーマ・難易度・手数・催促フィルター', 
   await page.getByLabel('テーマ', { exact: true }).selectOption('すべて');
   await page.getByLabel('難易度', { exact: true }).selectOption('すべて');
   await page.getByLabel('構築手数', { exact: true }).selectOption('3');
-  await expect(page.locator('.drill-card')).toHaveCount(13);
+  await expect(page.locator('.drill-card')).toHaveCount(
+    drills.filter((d) => d.queue.length === 3).length,
+  );
   await page.getByLabel('構築手数', { exact: true }).selectOption('すべて');
   await page.locator('.filter-tabs').getByRole('button', { name: '催促・判断' }).click();
   await expect(page.locator('.drill-card')).toHaveCount(8);

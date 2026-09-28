@@ -12,6 +12,8 @@ import {
   Lightbulb,
 } from 'lucide-react';
 import Board from './Board';
+import useGameControls from './useGameControls';
+import ControllerPanel from './ControllerPanel';
 import Puyo from './Puyo';
 import { SourceLinks } from './Simulator';
 import {
@@ -73,16 +75,33 @@ export default function NextTrainer({
     const ts = witnessTurns(d);
     return { turns: ts, report: evaluate(d, ts) };
   }, [d]);
+  const grounded = useRef<number | null>(null);
+  const rotationTime = useRef(0);
   function act(a: Action) {
     if (!canMove) return;
-    const next = move(board, piece, a);
+    const now = performance.now();
+    const rotating = a === 'cw' || a === 'ccw';
+    const origin =
+      piece.quick && now - rotationTime.current > 300 ? { ...piece, quick: undefined } : piece;
+    const next = move(board, origin, a);
+    if (rotating) rotationTime.current = now;
+    if (a === 'down' && next.y === piece.y) {
+      grounded.current ??= now;
+      if (now - grounded.current >= 250) {
+        grounded.current = null;
+        place();
+      }
+      return;
+    }
     if (next !== piece) {
+      grounded.current = null;
       setPiece(next);
       setInputs((n) => n + 1);
     }
   }
   function place() {
     if (!canMove) return;
+    grounded.current = null;
     const result = drop(board, piece);
     if (!result) return;
     const target = landing(board, piece);
@@ -101,6 +120,7 @@ export default function NextTrainer({
     if (turns.length + 1 < d.queue.length) setPiece(spawn(d.queue[turns.length + 1]));
   }
   function reset() {
+    grounded.current = null;
     setTurns([]);
     setPiece(spawn(d.queue[0]));
     setInputs(0);
@@ -110,6 +130,7 @@ export default function NextTrainer({
   }
   function undo() {
     if (!turns.length) return;
+    grounded.current = null;
     const prev = turns.slice(0, -1);
     setTurns(prev);
     setPiece(spawn(d.queue[prev.length]));
@@ -130,40 +151,26 @@ export default function NextTrainer({
     if (!r) return;
     setReview({ example, frames: replayFrames(d.board, ts, r), index: 0, playing: false });
   }
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (
-        e.ctrlKey ||
-        e.altKey ||
-        e.metaKey ||
-        e.target instanceof HTMLInputElement ||
-        e.target instanceof HTMLTextAreaElement ||
-        e.target instanceof HTMLSelectElement
-      )
+  const controls = useGameControls(
+    (command) => {
+      if (command === 'undo') {
+        undo();
         return;
-      const a: Record<string, Action> = {
-        ArrowLeft: 'left',
-        ArrowRight: 'right',
-        ArrowDown: 'down',
-        x: 'cw',
-        X: 'cw',
-        ArrowUp: 'cw',
-        z: 'ccw',
-        Z: 'ccw',
-      };
-      if (e.code === 'Space') {
-        if (canMove) {
-          e.preventDefault();
-          if (!e.repeat) place();
-        }
-      } else if (a[e.key] && canMove) {
-        e.preventDefault();
-        act(a[e.key]);
       }
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  });
+      if (command === 'answer') {
+        if (!review) answer();
+        return;
+      }
+      if (command === 'drop') {
+        place();
+        return;
+      }
+      act(command);
+    },
+    () => {
+      grounded.current = null;
+    },
+  );
   useEffect(() => {
     if (!review?.playing) return;
     const timer = window.setTimeout(
@@ -251,7 +258,8 @@ export default function NextTrainer({
             最初から
           </button>
         </div>
-        <p className="key-hint">← → 移動 / Z X 回転 / Space 確定</p>
+        <p className="key-hint">← → 移動 / Z X 回転 / ↓ 落下 / Space 確定 / U 戻す</p>
+        <ControllerPanel controls={controls} />
         {!ready && !fits(board, piece) && !review && (
           <p role="status">次のツモを出せません。1手戻して配置を変更してください。</p>
         )}

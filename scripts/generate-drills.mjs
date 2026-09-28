@@ -248,6 +248,104 @@ for (const d of drills) {
     controls++;
   }
 }
+// Expanded research catalogue. Keep existing IDs and exercises stable for saved progress.
+const expanded = JSON.parse(
+  readFileSync(new URL('./research/expanded-motifs.json', import.meta.url)),
+);
+const rejected = [];
+const canonical = (board) => {
+  const normalize = (b) => {
+    const palette = new Map();
+    let color = 0;
+    return b
+      .flat()
+      .map((v) => {
+        if (!v || v === 6) return v;
+        if (!palette.has(v)) palette.set(v, ++color);
+        return palette.get(v);
+      })
+      .join('');
+  };
+  return [normalize(board), normalize(board.map((r) => [...r].reverse()))].sort()[0];
+};
+const canonicalSeen = new Set(drills.filter((d) => !d.attack).map((d) => canonical(d.board)));
+for (const m of expanded) {
+  cache.clear();
+  const s = seed(m);
+  if (!s || s.fire.result.chains < 3) {
+    rejected.push({ id: m.id, reason: '到達可能な3連鎖以上の発火なし' });
+    continue;
+  }
+  let added = 0;
+  for (const count of [1, 2, 3, 4]) {
+    let selected;
+    for (let trial = 0; trial < 160; trial++) {
+      let b = s.board;
+      const reverse = [];
+      for (let i = 0; i < count; i++) {
+        const opts = removals(b);
+        if (!opts.length) break;
+        const p = opts[rand(opts.length)];
+        reverse.push(p);
+        b = p.board;
+      }
+      if (reverse.length !== count || canonicalSeen.has(canonical(b))) continue;
+      if (reverse.some((p) => (best(p.board, s.probe)?.result.chains ?? 0) >= s.fire.result.chains))
+        continue;
+      selected = { board: b, steps: reverse.reverse() };
+      break;
+    }
+    if (!selected) continue;
+    const { board, steps } = selected;
+    canonicalSeen.add(canonical(board));
+    added++;
+    const noSplit =
+      count > 1 &&
+      steps.every((p) => p.target[0].x === p.target[1].x || p.target[0].y === p.target[1].y);
+    drills.push({
+      id: `study-${m.id}-${count}`,
+      type: 'sequence',
+      category: noSplit ? '操作の最適化' : '次の一手',
+      topic: m.topic,
+      level: count >= 3 || s.fire.result.chains >= 9 ? '上級' : '中級',
+      title: `${m.title} ${String(drills.filter((d) => d.topic === m.topic).length + 1).padStart(2, '0')}`,
+      description: `${count}手で接続を作り、確認ツモから${s.fire.result.chains}連鎖以上。構築中の消去は禁止。${noSplit ? ' ちぎり0回。' : ''}`,
+      hint: m.note,
+      explanation: m.note,
+      board,
+      queue: steps.map((p) => p.pair),
+      probe: s.probe,
+      minChains: s.fire.result.chains,
+      witness: steps.map((p) => p.path),
+      sources: m.sources,
+      origin: m.origin,
+      motif: m.id,
+      solutionNote:
+        steps
+          .map(
+            (p, i) =>
+              `${i + 1}手目：${p.target.map((c) => `${COLORS[c.color]}を${c.x + 1}列${c.y + 1}段`).join('、')}`,
+          )
+          .join('。') + `。確認ツモで${s.fire.result.chains}連鎖。`,
+      noSplit,
+    });
+  }
+  if (!added) rejected.push({ id: m.id, reason: '欠けた接続を合法手順で復元する課題なし' });
+  console.log(m.id, s.fire.result.chains, added);
+}
+writeFileSync(
+  new URL('./research/generation-report.json', import.meta.url),
+  JSON.stringify(
+    {
+      total: drills.length,
+      topics: [...new Set(drills.map((d) => d.topic))],
+      motifs: new Set(drills.map((d) => d.motif)).size,
+      rejected,
+    },
+    null,
+    2,
+  ) + '\n',
+);
 writeFileSync(
   new URL('../src/data/next-drills.json', import.meta.url),
   JSON.stringify(drills, null, 2).replace(
@@ -255,4 +353,8 @@ writeFileSync(
     (row) => '[' + row.match(/[0-6]/g).join(', ') + ']',
   ) + '\n',
 );
-console.log({ total: drills.length, attacks, controls });
+console.log({
+  total: drills.length,
+  attacks: drills.filter((d) => d.attack).length,
+  controls: drills.filter((d) => d.noSplit).length,
+});

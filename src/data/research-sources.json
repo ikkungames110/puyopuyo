@@ -1,0 +1,100 @@
+[
+  {
+    "id": "alg24",
+    "title": "折り返しの後",
+    "author": "壱大整域",
+    "url": "https://alg-d.com/game/puyo/chain24.html",
+    "note": "上段の伸ばし・巻き込み・余りぷよ・第二折り返しの数値盤面を構築課題へ加工。"
+  },
+  {
+    "id": "alg15",
+    "title": "他の折り返し",
+    "author": "壱大整域",
+    "url": "https://alg-d.com/game/puyo/chain15.html",
+    "note": "なめくじ・座布団L字・新GTR・L字の数値盤面を構築課題へ加工。"
+  },
+  {
+    "id": "alg22",
+    "title": "連鎖尾動画解説",
+    "author": "壱大整域",
+    "url": "https://alg-d.com/game/puyo/chain22.html",
+    "note": "床の先置きと回収を、記事内の数値盤面から課題化。"
+  },
+  {
+    "id": "alg23",
+    "title": "連鎖動画解説",
+    "author": "壱大整域",
+    "url": "https://alg-d.com/game/puyo/chain23.html",
+    "note": "後折りと余りぷよ回収の途中形を構築課題へ加工。"
+  },
+  {
+    "id": "alg6",
+    "title": "GTR動画解説",
+    "author": "壱大整域",
+    "url": "https://alg-d.com/game/puyo/chain6.html",
+    "note": "ツモに応じたGTRの組み替えを数値盤面から課題化。"
+  },
+  {
+    "id": "alg18",
+    "title": "2色発火",
+    "author": "壱大整域",
+    "url": "https://alg-d.com/game/puyo/chain18.html",
+    "note": "複数の発火口を残す考え方を学習ノートで参照。"
+  },
+  {
+    "id": "delta-multi",
+    "title": "折り返しの上で困ったらコレ！「多重折り返し」",
+    "author": "delta / ぷよぷよキャンプ",
+    "url": "https://puyo-camp.jp/posts/171090",
+    "note": "横3の予約・多重の積み重ね・第二折り返しへの応用を学習ノートで参照。"
+  },
+  {
+    "id": "momo-fold",
+    "title": "momoken流「多重折り返し」講座まとめ",
+    "author": "ゆーふぉ / ぷよブロ！",
+    "url": "https://puyo-euphonic.com/momoken-fold-lectureship",
+    "note": "動画の座布団型・L字型の説明を記事と照合。図の転記は元動画のフレームから実施。"
+  },
+  {
+    "id": "video-OhlgW42vPo8",
+    "title": "【初心者向け】誰でも10連鎖出来るようになるぷよぷよ講座【GTR/かぎ積み/ぷよぷよeスポーツ/ゆっくり解説/ゆっくり実況】",
+    "author": "yellowbird-きとりch- / YouTube",
+    "url": "https://www.youtube.com/watch?v=OhlgW42vPo8",
+    "note": "調査時 1,251,411 回再生。動画・字幕を取得し、要点の字幕と盤面フレームを分析。"
+  },
+  {
+    "id": "video--3lJeLp7ApQ",
+    "title": "【初級者向け】GTRの連鎖尾部分を徹底解説",
+    "author": "momoken / YouTube",
+    "url": "https://www.youtube.com/watch?v=-3lJeLp7ApQ",
+    "note": "調査時 135,892 回再生。動画・字幕を取得し、要点の字幕と盤面フレームを分析。"
+  },
+  {
+    "id": "video-aRsLjITw1nc",
+    "title": "【前編】ぷよぷよ初心者に分かりやすいGTR講座作りました。｜簡単な基礎知識",
+    "author": "なもこ -Namoco- / YouTube",
+    "url": "https://www.youtube.com/watch?v=aRsLjITw1nc",
+    "note": "調査時 106,398 回再生。動画・字幕を取得し、要点の字幕と盤面フレームを分析。"
+  },
+  {
+    "id": "video-uvblsdeVOvY",
+    "title": "momoken流「多重折返し」講座",
+    "author": "momoken / YouTube",
+    "url": "https://www.youtube.com/watch?v=uvblsdeVOvY",
+    "note": "調査時 80,251 回再生。動画・字幕を取得し、要点の字幕と盤面フレームを分析。"
+  },
+  {
+    "id": "video-DNtHSfjZ4cc",
+    "title": "ワンランク上の連鎖尾講座【中～上級者向け】",
+    "author": "momoken / YouTube",
+    "url": "https://www.youtube.com/watch?v=DNtHSfjZ4cc",
+    "note": "調査時 58,345 回再生。動画・字幕を取得し、要点の字幕と盤面フレームを分析。"
+  },
+  {
+    "id": "video-VSMX52gpB8U",
+    "title": "GTRで、1手ごとに考えていることをすべて解説 │delta 【ぷよぷよ】",
+    "author": "delta CHANNEL / YouTube",
+    "url": "https://www.youtube.com/watch?v=VSMX52gpB8U",
+    "note": "調査時 44,578 回再生。動画・字幕を取得し、要点の字幕と盤面フレームを分析。"
+  }
+]

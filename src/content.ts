@@ -1,6 +1,11 @@
 import type { Board, Pair, Resolution, Cell, Action } from './engine';
 import nextDrills from './data/next-drills.json' with { type: 'json' };
+import researchSources from './data/research-sources.json' with { type: 'json' };
+import researchVideos from './data/research-videos.json' with { type: 'json' };
+import studyNotes from './data/study-notes.json' with { type: 'json' };
+export const videos = researchVideos;
 export const sources = [
+  ...researchSources,
   {
     id: 'mid',
     title: '中盤戦術技術徹底攻略 第一部',
@@ -219,7 +224,20 @@ export function isCorrect(d: PlacementDrill, result: Resolution, target: Cell[],
   );
 }
 
-export const lessons = [
+export type Lesson = {
+  title: string;
+  tag: string;
+  text: string;
+  sources: string[];
+  track?: string;
+  topics?: string[];
+  checkpoints?: string[];
+  mistake?: string;
+  video?: string | null;
+  seconds?: number;
+};
+export const lessons: Lesson[] = [
+  ...studyNotes,
   {
     title: 'NEXTの置き場所から逆算する',
     tag: '次の一手',

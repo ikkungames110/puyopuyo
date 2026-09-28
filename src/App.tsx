@@ -21,9 +21,10 @@ import {
   Upload,
 } from 'lucide-react';
 import Puyo, { AssetContext } from './Puyo';
-import Simulator, { SourceLinks } from './Simulator';
+import Simulator from './Simulator';
 import NextTrainer from './NextTrainer';
-import { categories, topics, drills, lessons, sources, type Category, type Drill } from './content';
+import StudyLibrary, { ResearchVideos, type StudySeed } from './StudyLibrary';
+import { categories, topics, drills, sources, type Category, type Drill } from './content';
 import { readProgress, saveProgress, localDay, streak, type Progress } from './storage';
 import { COLORS } from './engine';
 type Page = 'home' | 'drills' | 'simulator' | 'knowledge' | 'progress' | 'sources' | 'settings';
@@ -60,6 +61,7 @@ function loadAssets(): Record<number, string> {
 }
 export default function App() {
   const [page, setPage] = useState<Page>('home');
+  const [sandboxSeed, setSandboxSeed] = useState<StudySeed | undefined>();
   const [active, setActive] = useState<Drill | null>(null);
   const [category, setCategory] = useState<Category>('すべて');
   const [topic, setTopic] = useState('すべて');
@@ -110,6 +112,7 @@ export default function App() {
   const featured = drills.find((d) => d.id === 'next-piro-1-2')!;
   const current = active ?? featured;
   function go(p: Page) {
+    setSandboxSeed(undefined);
     setPage(p);
     setActive(null);
     setSession((s) => s + 1);
@@ -274,7 +277,7 @@ export default function App() {
                     <p>
                       考えて、置いて、わかる。
                       <br className="mobile-only" />
-                      連鎖尾・折り返し・催促を、72の盤面で。
+                      連鎖尾・折り返し・催促を、{drills.length}の盤面で。
                     </p>
                     <div className="banner-tags">
                       <span>
@@ -488,7 +491,7 @@ export default function App() {
                         onChange={(e) => setTurnCount(e.target.value)}
                       >
                         <option>すべて</option>
-                        {[1, 2, 3].map((n) => (
+                        {[1, 2, 3, 4].map((n) => (
                           <option key={n} value={n}>
                             {n}手
                           </option>
@@ -601,48 +604,29 @@ export default function App() {
                   <h1>思いついたら、試してみよう。</h1>
                   <p>置き直して、見比べて。自分だけの連鎖をつくる実験室。</p>
                 </div>
-                <Simulator onAttempt={() => {}} onBest={best} />
+                <Simulator key={session} initial={sandboxSeed} onAttempt={() => {}} onBest={best} />
               </>
             )}
             {page === 'knowledge' && (
-              <>
-                <div className="page-heading">
-                  <span className="small-kicker">LEARNING NOTES</span>
-                  <h1>「なんとなく」を、理解に。</h1>
-                  <p>調査した講座の考え方を、練習につながる短いノートにまとめました。</p>
-                </div>
-                <div className="lesson-grid">
-                  {lessons.map((l, i) => (
-                    <article className="lesson-card" key={l.title}>
-                      <span className="lesson-number">0{i + 1}</span>
-                      <span className="pill">{l.tag}</span>
-                      <h2>{l.title}</h2>
-                      <p>{l.text}</p>
-                      <SourceLinks ids={l.sources} />
-                      <button
-                        className="text-link"
-                        onClick={() => {
-                          setCategory(l.tag as Category);
-                          setTopic('すべて');
-                          setDifficulty('すべて');
-                          setTurnCount('すべて');
-                          setReviewOnly(false);
-                          go('drills');
-                        }}
-                      >
-                        関連するドリルへ
-                        <ArrowRight size={16} />
-                      </button>
-                    </article>
-                  ))}
-                </div>
-                <div className="small-note wide">
-                  <BookOpen />
-                  <p>
-                    構築問題は参照記事の連鎖形から配ぷよ・不足する接続・達成条件を設定した派生課題です。元記事の解説画像は収録していません。催促問題は残しまで評価する本サイト独自の条件で、対戦全体の最善手を保証するものではありません。
-                  </p>
-                </div>
-              </>
+              <StudyLibrary
+                onTopic={(nextTopic, nextCategory) => {
+                  setCategory(nextCategory as Category);
+                  setTopic(nextTopic);
+                  setDifficulty('すべて');
+                  setTurnCount('すべて');
+                  setReviewOnly(false);
+                  setSearch('');
+                  go('drills');
+                }}
+                onPractice={(d) => {
+                  go('drills');
+                  setActive(d);
+                }}
+                onSeed={(seed) => {
+                  go('simulator');
+                  setSandboxSeed(seed);
+                }}
+              />
             )}
             {page === 'progress' && (
               <>
@@ -786,6 +770,7 @@ export default function App() {
                     公式資料とプレイヤーの講座をもとに、練習テーマを組み立てています。確認日：2026年9月28日。
                   </p>
                 </div>
+                <ResearchVideos />
                 <div className="source-list">
                   {sources.map((s, i) => (
                     <a key={s.id} href={s.url} target="_blank" rel="noreferrer">
@@ -817,7 +802,7 @@ export default function App() {
                     このローカル環境では「ぷよぷよプログラミング」由来の公式ぷよ画像を使用しています（©SEGA）。配布教材を収録した第三者リポジトリから原画像と利用許諾書を取得し、画像を改変せず表示しています。素材はGit管理の対象外です。一般公開・再配布を行う場合は配布元の利用条件を別途確認してください。
                   </p>
                   <p>
-                    6列×12段と非表示の13段目、4個消し、重力、連鎖、色ぷよの消去得点を実装。13段目では消去判定を行いません。回転は基本の壁・床補正のみで、クイックターン・先行入力・製品ごとのフレーム挙動・対戦相殺は対象外です。全消しは検出しますが、ボーナスの持越しは行いません。
+                    6列×12段と非表示の13段目、4個消し、重力、連鎖、色ぷよの消去得点を実装。13段目では消去判定を行いません。基本の壁・床補正、クイックターン、長押し移動、ゲームパッド入力に対応。先行入力・製品ごとのフレーム挙動・対戦相殺は対象外です。全消しは検出しますが、ボーナスの持越しは行いません。
                   </p>
                 </section>
               </>
