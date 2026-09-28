@@ -1,6 +1,6 @@
 # PUYO LAB — ぷよぷよ練習室
 
-個人のローカル環境で使う、日本語のぷよぷよシミュレーターと練習ドリルです。React / TypeScript / Vite。サーバーやアカウント登録は不要です。
+ブラウザで使う、日本語のぷよぷよシミュレーターと練習ドリルです。React / TypeScript / Vite。GitHub Pagesでの公開とローカル利用に対応し、バックエンドやアカウント登録は不要です。
 
 ## 起動
 
@@ -12,6 +12,28 @@ npm run dev
 ```
 
 ターミナルに表示される `http://127.0.0.1:5173/` を開きます。使用中の場合は次の空きポートが選ばれます。ホストはローカルマシンに限定しています。
+
+## GitHub Pagesで公開する
+
+公開先は `https://ikkungames110.github.io/puyopuyo/` です。リポジトリの所有者がGitHub上で以下を実行します。
+
+1. リポジトリの **Settings → Pages → Build and deployment → Source** で **GitHub Actions** を選択します。
+2. **Actions → Deploy to GitHub Pages → Run workflow** から **main** を選んで実行します。
+3. ワークフローが完了したら、表示された公開URLを開きます。
+
+以降の更新も同じワークフローを手動実行します。pushだけでは公開されません。ワークフローは依存関係のインストール、ユニットテスト、公開用ビルド、公開用E2Eテストを実行してから、`dist/` を配信します。設定方法は [GitHubの公式ドキュメント](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages) を参照してください。
+
+公開前にローカルで確認する場合：
+
+```sh
+npm ci
+npm run build:pages
+npm run preview:pages
+```
+
+`http://127.0.0.1:4173/puyopuyo/` を開きます。公開用ビルドは `/puyopuyo/` を基準にJS・CSS・フォントを読み込みます。リポジトリ名や独自ドメインを変更する場合は、`vite.config.ts` の `base` と公開用テストのURLも更新してください（[Viteの公式ガイド](https://vite.dev/guide/static-deploy.html#github-pages)）。
+
+公開用ビルドは同梱イラストを使用し、ローカル専用の `public/official/` を含めません。`public/` の自動コピーを無効にし、フォントのライセンスだけを明示的に同梱します。調査用動画・字幕・フレームも公開物には含まれません。学習記録・表示設定は各ブラウザ内に保存され、ローカル版の記録は公開先へ自動移行されません。
 
 ## できること
 
@@ -89,7 +111,7 @@ python3 scripts/research-videos.py --discover --download \
 npm run assets:install
 ```
 
-教材の利用条件は `public/official/SEGA_License.txt` を参照してください。これはあらゆる用途への利用許可を主張するものではありません。一般公開・再配布・商用化は本実装の範囲外です。Viteのビルド時にはローカル画像が `dist/official/` にもコピーされるため、`dist/` も公開しないでください。
+教材の利用条件は `public/official/SEGA_License.txt` を参照してください。これはあらゆる用途への利用許可を主張するものではありません。通常の `npm run build` はローカル画像を `dist/official/` にコピーするため、その出力はローカル確認専用です。GitHub Pagesには、公式画像を含めない **`npm run build:pages` の出力**を使用してください。
 
 公式画像が配置されていない環境ではアプリ内の仮イラストにフォールバックします。「表示設定」から色ごとの画像をこのブラウザ内に設定することもできます。
 
@@ -113,6 +135,8 @@ npm test
 npm run build
 npx playwright install --with-deps chromium
 npm run test:e2e
+npm run build:pages
+npm run test:pages
 ```
 
 ユニットテスト386件で全352問の合法な解答・別解・暴発・催促後の残し・色替えや反転の重複除外・入力リピート・クイックターンを検証。E2EではGamepad APIの模擬入力、キーボード／タッチ、落下停止、接地確定、設定保存、切断・復帰、教材から自由練習への移行、スマホ表示まで検証します。物理コントローラーを接続しての実機テストは、この環境では未実施です。

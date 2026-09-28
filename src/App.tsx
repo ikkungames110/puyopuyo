@@ -76,19 +76,22 @@ export default function App() {
   const [assets, setAssets] = useState<Record<number, string>>(loadAssets);
   const [defaultAssets, setDefaultAssets] = useState<Record<number, string>>({});
   useEffect(() => {
+    if (import.meta.env.MODE === 'pages') return;
     let cancelled = false;
-    fetch('/official/manifest.json')
+    fetch(`${import.meta.env.BASE_URL}official/manifest.json`)
       .then((r) => (r.ok ? r.json() : {}))
       .then((v) => {
         if (!cancelled && v && typeof v === 'object')
           setDefaultAssets(
             Object.fromEntries(
-              Object.entries(v).filter(
-                ([k, path]) =>
-                  /^[1-6]$/.test(k) &&
-                  typeof path === 'string' &&
-                  /^\/official\/[a-zA-Z0-9_]+\.png$/.test(path),
-              ),
+              Object.entries(v)
+                .filter(
+                  ([k, path]) =>
+                    /^[1-6]$/.test(k) &&
+                    typeof path === 'string' &&
+                    /^\/official\/[a-zA-Z0-9_]+\.png$/.test(path),
+                )
+                .map(([k, path]) => [k, `${import.meta.env.BASE_URL}${(path as string).slice(1)}`]),
             ) as Record<number, string>,
           );
       })
@@ -786,20 +789,24 @@ export default function App() {
                 </div>
                 <section className="license-card">
                   <h2>素材とシミュレーションについて</h2>
-                  <a
-                    className="text-link"
-                    href="/official/SEGA_License.txt"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    素材に付属する利用許諾書 ↗
-                  </a>
+                  {Object.keys(defaultAssets).length > 0 && (
+                    <a
+                      className="text-link"
+                      href={`${import.meta.env.BASE_URL}official/SEGA_License.txt`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      素材に付属する利用許諾書 ↗
+                    </a>
+                  )}
                   <p>
                     PUYO
                     LABは非公式の練習用プロジェクトです。株式会社セガとの提携・監修を示すものではありません。「ぷよぷよ」の権利は株式会社セガに帰属します。
                   </p>
                   <p>
-                    このローカル環境では「ぷよぷよプログラミング」由来の公式ぷよ画像を使用しています（©SEGA）。配布教材を収録した第三者リポジトリから原画像と利用許諾書を取得し、画像を改変せず表示しています。素材はGit管理の対象外です。一般公開・再配布を行う場合は配布元の利用条件を別途確認してください。
+                    {Object.keys(defaultAssets).length > 0
+                      ? 'このローカル環境では「ぷよぷよプログラミング」由来の公式ぷよ画像を使用しています（©SEGA）。配布教材を収録した第三者リポジトリから原画像と利用許諾書を取得し、画像を改変せず表示しています。素材はGit管理の対象外です。'
+                      : '標準のぷよ表示には、このアプリに同梱したイラストを使用しています。公式ぷよ画像は配信していません。表示設定で読み込んだ画像は、このブラウザ内にのみ保存されます。'}
                   </p>
                   <p>
                     6列×12段と非表示の13段目、4個消し、重力、連鎖、色ぷよの消去得点を実装。13段目では消去判定を行いません。基本の壁・床補正、クイックターン、長押し移動、ゲームパッド入力に対応。先行入力・製品ごとのフレーム挙動・対戦相殺は対象外です。全消しは検出しますが、ボーナスの持越しは行いません。
