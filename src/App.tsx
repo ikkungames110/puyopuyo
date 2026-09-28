@@ -23,8 +23,18 @@ import {
 import Puyo, { AssetContext } from './Puyo';
 import Simulator from './Simulator';
 import NextTrainer from './NextTrainer';
+import QuizTrainer from './QuizTrainer';
 import StudyLibrary, { ResearchVideos, type StudySeed } from './StudyLibrary';
-import { categories, topics, drills, sources, type Category, type Drill } from './content';
+import {
+  categories,
+  topics,
+  practiceDrills as drills,
+  sources,
+  drillTags,
+  matchesDrillSearch,
+  type Category,
+  type PracticeDrill as Drill,
+} from './content';
 import { readProgress, saveProgress, localDay, streak, type Progress } from './storage';
 import { COLORS } from './engine';
 type Page = 'home' | 'drills' | 'simulator' | 'knowledge' | 'progress' | 'sources' | 'settings';
@@ -76,7 +86,6 @@ export default function App() {
   const [assets, setAssets] = useState<Record<number, string>>(loadAssets);
   const [defaultAssets, setDefaultAssets] = useState<Record<number, string>>({});
   useEffect(() => {
-    if (import.meta.env.MODE === 'pages') return;
     let cancelled = false;
     fetch(`${import.meta.env.BASE_URL}official/manifest.json`)
       .then((r) => (r.ok ? r.json() : {}))
@@ -157,29 +166,57 @@ export default function App() {
     }
   }
   function next() {
-    const at = drills.findIndex((d) => d.id === current.id);
-    openDrill(drills[(at + 1) % drills.length]);
+    const list = filtered.some((d) => d.id === current.id) ? filtered : drills;
+    const at = list.findIndex((d) => d.id === current.id);
+    openDrill(list[(at + 1) % list.length]);
+  }
+  function searchTag(tag: string) {
+    setSearch(`#${tag}`);
+    setCategory('すべて');
+    setTopic('すべて');
+    setDifficulty('すべて');
+    setTurnCount('すべて');
+    setReviewOnly(false);
+    go('drills');
   }
   const filtered = drills.filter(
     (d) =>
-      (category === 'すべて' || category === '次の一手' || d.category === category) &&
+      (category === 'すべて' ||
+        (category === '次の一手' && d.type === 'sequence') ||
+        d.category === category) &&
       (!reviewOnly || review.has(d.id)) &&
       (topic === 'すべて' || d.topic === topic) &&
       (difficulty === 'すべて' || d.level === difficulty) &&
-      (turnCount === 'すべて' || d.queue.length === Number(turnCount)) &&
-      `${d.title}${d.description}${d.topic}${d.sources.map((id) => sources.find((s) => s.id === id)?.author).join(' ')}`.includes(
-        search,
-      ),
+      (turnCount === 'すべて' || (d.type === 'sequence' && d.queue.length === Number(turnCount))) &&
+      matchesDrillSearch(d, search),
   );
-  const renderPractice = (d: Drill) => (
-    <NextTrainer
-      key={`${d.id}-${session}`}
-      drill={d}
-      onAttempt={attempt}
-      onBest={best}
-      onNext={next}
-    />
-  );
+  const renderPractice = (d: Drill) =>
+    d.type === 'quiz' ? (
+      <QuizTrainer
+        key={`${d.id}-${session}`}
+        drill={d}
+        onAttempt={attempt}
+        onNext={next}
+        onTag={searchTag}
+      />
+    ) : (
+      <>
+        <div className="tag-list">
+          {drillTags(d).map((tag) => (
+            <button className="tag-button" key={tag} onClick={() => searchTag(tag)}>
+              #{tag}
+            </button>
+          ))}
+        </div>
+        <NextTrainer
+          key={`${d.id}-${session}`}
+          drill={d}
+          onAttempt={attempt}
+          onBest={best}
+          onNext={next}
+        />
+      </>
+    );
   return (
     <AssetContext.Provider value={{ ...defaultAssets, ...assets }}>
       <div className="app-shell">
@@ -377,7 +414,7 @@ export default function App() {
                 </div>
                 <div className="focus-grid">
                   {categories.slice(1).map((c, i) => {
-                    const Icon = [Layers3, Target, Gamepad2][i];
+                    const Icon = [Layers3, Target, Gamepad2, BookOpen][i];
                     return (
                       <button
                         key={c}
@@ -402,11 +439,18 @@ export default function App() {
                               '1〜3手先まで読む、接続の実戦ドリル。',
                               '短い攻撃を撃ち、本線を残す配置。',
                               'ちぎらずに、接続を完成させる手順。',
+                              '図を比べて、段差・配色・消去順を判断。',
                             ][i]
                           }
                         </p>
                         <div>
-                          {drills.filter((d) => c === '次の一手' || d.category === c).length} ドリル
+                          {
+                            drills.filter(
+                              (d) =>
+                                (c === '次の一手' && d.type === 'sequence') || d.category === c,
+                            ).length
+                          }{' '}
+                          ドリル
                           <ArrowUpRight size={20} />
                         </div>
                       </button>
@@ -436,7 +480,7 @@ export default function App() {
                     <h1>次の一手を、深く読む。</h1>
                     <p>
                       {drills.length}問・{topics.length}
-                      テーマ。NEXT構築、催促の残し、ちぎり回避を盤面で回答。
+                      テーマ。配置問題と、図を比較する判断問題で練習。
                     </p>
                   </div>
                   <div className="filter-bar">
@@ -455,10 +499,31 @@ export default function App() {
                       <Search size={16} />
                       <input
                         placeholder="ドリルを検索"
+                        aria-label="ドリルを検索（キーワード・#タグ）"
+                        aria-describedby="tag-search-help"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                       />
                     </label>
+                  </div>
+                  <p id="tag-search-help" className="search-help">
+                    #タグで絞り込み。スペースで区切るとすべての条件に一致する問題を探せます。
+                  </p>
+                  <div className="tag-list" aria-label="タグで検索">
+                    {[
+                      '記事104662',
+                      'ちぇすな',
+                      'GTR',
+                      '雪崩',
+                      'Y字下ゾロ',
+                      'Y字下二色',
+                      '鶴亀',
+                      '仕込み',
+                    ].map((tag) => (
+                      <button className="tag-button" key={tag} onClick={() => searchTag(tag)}>
+                        #{tag}
+                      </button>
+                    ))}
                   </div>
                   <div className="advanced-filters">
                     <label>
@@ -503,7 +568,7 @@ export default function App() {
                     </label>
                   </div>
                   <div className="research-summary">
-                    8つの攻略サイト・21記事を参照。完成例から作成した派生課題と独自の催促課題です。各問題に元記事と問題化の内容を記載しています。
+                    攻略記事・動画の完成例から作成した配置問題と判断問題です。ちぇすなさんの記事は全節を56問にまとめています。各問題に出典を記載しています。
                   </div>
                   <div className="list-meta">
                     <span>{filtered.length} 件のドリル</span>
@@ -547,23 +612,39 @@ export default function App() {
                               )}
                           </div>
                           <div className="preview-queue">
-                            <span>{d.queue.length}手で構築</span>
-                            <div>
-                              {d.queue.map((p, i) => (
-                                <span key={i} className="preview-pair">
-                                  <Puyo color={p[1]} />
-                                  <Puyo color={p[0]} />
-                                </span>
-                              ))}
-                            </div>
-                            <small>
-                              {d.attack ? '攻撃後に' : ''}
-                              {d.minChains}連鎖以上{d.noSplit ? ' · ちぎり0' : ''}
-                            </small>
+                            {d.type === 'sequence' ? (
+                              <>
+                                <span>{d.queue.length}手で構築</span>
+                                <div>
+                                  {d.queue.map((p, i) => (
+                                    <span key={i} className="preview-pair">
+                                      <Puyo color={p[1]} />
+                                      <Puyo color={p[0]} />
+                                    </span>
+                                  ))}
+                                </div>
+                                <small>
+                                  {d.attack ? '攻撃後に' : ''}
+                                  {d.minChains}連鎖以上{d.noSplit ? ' · ちぎり0' : ''}
+                                </small>
+                              </>
+                            ) : (
+                              <>
+                                <span>図を読んで判断</span>
+                                <small>{d.diagrams.length}図を比較 · 選択式</small>
+                              </>
+                            )}
                           </div>
                         </div>
                         <h3>{d.title}</h3>
                         <p>{d.description}</p>
+                        <div className="tag-list card-tags">
+                          {drillTags(d)
+                            .slice(0, 8)
+                            .map((tag) => (
+                              <span key={tag}>#{tag}</span>
+                            ))}
+                        </div>
                         <div className="drill-card-bottom">
                           <span>
                             {sources
@@ -709,7 +790,9 @@ export default function App() {
                 </div>
                 <div className="category-progress">
                   {categories.slice(1).map((c) => {
-                    const all = drills.filter((d) => c === '次の一手' || d.category === c),
+                    const all = drills.filter(
+                        (d) => (c === '次の一手' && d.type === 'sequence') || d.category === c,
+                      ),
                       count = all.filter((d) => mastered.has(d.id)).length;
                     return (
                       <div key={c}>
@@ -805,7 +888,7 @@ export default function App() {
                   </p>
                   <p>
                     {Object.keys(defaultAssets).length > 0
-                      ? 'このローカル環境では「ぷよぷよプログラミング」由来の公式ぷよ画像を使用しています（©SEGA）。配布教材を収録した第三者リポジトリから原画像と利用許諾書を取得し、画像を改変せず表示しています。素材はGit管理の対象外です。'
+                      ? '「ぷよぷよプログラミング」由来の公式ぷよ画像を使用しています（©SEGA）。配布教材を収録した第三者リポジトリから原画像と利用許諾書を取得し、画像を改変せず表示しています。'
                       : '標準のぷよ表示には、このアプリに同梱したイラストを使用しています。公式ぷよ画像は配信していません。表示設定で読み込んだ画像は、このブラウザ内にのみ保存されます。'}
                   </p>
                   <p>

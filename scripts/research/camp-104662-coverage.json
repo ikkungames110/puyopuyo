@@ -1,0 +1,343 @@
+[
+  {
+    "figure": "camp-104662-02",
+    "exercises": [
+      "camp-104662-quiz-01"
+    ]
+  },
+  {
+    "figure": "camp-104662-03",
+    "exercises": [
+      "camp-104662-quiz-02"
+    ]
+  },
+  {
+    "figure": "camp-104662-04",
+    "exercises": [
+      "camp-104662-quiz-02"
+    ]
+  },
+  {
+    "figure": "camp-104662-05",
+    "exercises": [
+      "camp-104662-quiz-03"
+    ]
+  },
+  {
+    "figure": "camp-104662-06",
+    "exercises": [
+      "camp-104662-quiz-04"
+    ]
+  },
+  {
+    "figure": "camp-104662-07",
+    "exercises": [
+      "camp-104662-quiz-04"
+    ]
+  },
+  {
+    "figure": "camp-104662-08",
+    "exercises": [
+      "camp-104662-quiz-04"
+    ]
+  },
+  {
+    "figure": "camp-104662-09",
+    "exercises": [
+      "camp-104662-quiz-04"
+    ]
+  },
+  {
+    "figure": "camp-104662-10",
+    "exercises": [
+      "camp-104662-10-build",
+      "camp-104662-quiz-05"
+    ]
+  },
+  {
+    "figure": "camp-104662-11",
+    "exercises": [
+      "camp-104662-11-build",
+      "camp-104662-quiz-05"
+    ]
+  },
+  {
+    "figure": "camp-104662-12",
+    "exercises": [
+      "camp-104662-12-build",
+      "camp-104662-quiz-05"
+    ]
+  },
+  {
+    "figure": "camp-104662-13",
+    "exercises": [
+      "camp-104662-13-build",
+      "camp-104662-quiz-05"
+    ]
+  },
+  {
+    "figure": "camp-104662-14",
+    "exercises": [
+      "camp-104662-14-build",
+      "camp-104662-quiz-06"
+    ]
+  },
+  {
+    "figure": "camp-104662-15",
+    "exercises": [
+      "camp-104662-15-build",
+      "camp-104662-quiz-06"
+    ]
+  },
+  {
+    "figure": "camp-104662-16",
+    "exercises": [
+      "camp-104662-16-build",
+      "camp-104662-quiz-06"
+    ]
+  },
+  {
+    "figure": "camp-104662-17",
+    "exercises": [
+      "camp-104662-quiz-07"
+    ]
+  },
+  {
+    "figure": "camp-104662-18",
+    "exercises": [
+      "camp-104662-18-build",
+      "camp-104662-quiz-07"
+    ]
+  },
+  {
+    "figure": "camp-104662-19",
+    "exercises": [
+      "camp-104662-19-build",
+      "camp-104662-quiz-08"
+    ]
+  },
+  {
+    "figure": "camp-104662-20",
+    "exercises": [
+      "camp-104662-20-build",
+      "camp-104662-quiz-08"
+    ]
+  },
+  {
+    "figure": "camp-104662-21",
+    "exercises": [
+      "camp-104662-21-build",
+      "camp-104662-quiz-08"
+    ]
+  },
+  {
+    "figure": "camp-104662-22",
+    "exercises": [
+      "camp-104662-22-build",
+      "camp-104662-quiz-08"
+    ]
+  },
+  {
+    "figure": "camp-104662-23",
+    "exercises": [
+      "camp-104662-23-build",
+      "camp-104662-quiz-09"
+    ]
+  },
+  {
+    "figure": "camp-104662-24",
+    "exercises": [
+      "camp-104662-24-build",
+      "camp-104662-quiz-09"
+    ]
+  },
+  {
+    "figure": "camp-104662-25",
+    "exercises": [
+      "camp-104662-25-build",
+      "camp-104662-quiz-09"
+    ]
+  },
+  {
+    "figure": "camp-104662-26",
+    "exercises": [
+      "camp-104662-26-build",
+      "camp-104662-quiz-10"
+    ]
+  },
+  {
+    "figure": "camp-104662-27",
+    "exercises": [
+      "camp-104662-27-build",
+      "camp-104662-quiz-10"
+    ]
+  },
+  {
+    "figure": "camp-104662-28",
+    "exercises": [
+      "camp-104662-28-build",
+      "camp-104662-quiz-10"
+    ]
+  },
+  {
+    "figure": "camp-104662-29",
+    "exercises": [
+      "camp-104662-quiz-11"
+    ]
+  },
+  {
+    "figure": "camp-104662-30",
+    "exercises": [
+      "camp-104662-30-build",
+      "camp-104662-quiz-12"
+    ]
+  },
+  {
+    "figure": "camp-104662-31",
+    "exercises": [
+      "camp-104662-31-build",
+      "camp-104662-quiz-12"
+    ]
+  },
+  {
+    "figure": "camp-104662-32",
+    "exercises": [
+      "camp-104662-quiz-12"
+    ]
+  },
+  {
+    "figure": "camp-104662-33",
+    "exercises": [
+      "camp-104662-quiz-13"
+    ]
+  },
+  {
+    "figure": "camp-104662-34",
+    "exercises": [
+      "camp-104662-quiz-14"
+    ]
+  },
+  {
+    "figure": "camp-104662-35",
+    "exercises": [
+      "camp-104662-quiz-14"
+    ]
+  },
+  {
+    "figure": "camp-104662-36",
+    "exercises": [
+      "camp-104662-quiz-15"
+    ]
+  },
+  {
+    "figure": "camp-104662-37",
+    "exercises": [
+      "camp-104662-37-build",
+      "camp-104662-quiz-16"
+    ]
+  },
+  {
+    "figure": "camp-104662-38",
+    "exercises": [
+      "camp-104662-38-build",
+      "camp-104662-quiz-16"
+    ]
+  },
+  {
+    "figure": "camp-104662-39",
+    "exercises": [
+      "camp-104662-39-build",
+      "camp-104662-quiz-16"
+    ]
+  },
+  {
+    "figure": "camp-104662-40",
+    "exercises": [
+      "camp-104662-40-build",
+      "camp-104662-quiz-17"
+    ]
+  },
+  {
+    "figure": "camp-104662-41",
+    "exercises": [
+      "camp-104662-41-build",
+      "camp-104662-quiz-17"
+    ]
+  },
+  {
+    "figure": "camp-104662-42",
+    "exercises": [
+      "camp-104662-42-build",
+      "camp-104662-quiz-18"
+    ]
+  },
+  {
+    "figure": "camp-104662-43-base",
+    "exercises": [
+      "camp-104662-quiz-19"
+    ]
+  },
+  {
+    "figure": "camp-104662-43-a",
+    "exercises": [
+      "camp-104662-43-a-build",
+      "camp-104662-quiz-19"
+    ]
+  },
+  {
+    "figure": "camp-104662-43-b",
+    "exercises": [
+      "camp-104662-43-b-build",
+      "camp-104662-quiz-19"
+    ]
+  },
+  {
+    "figure": "camp-104662-43-c",
+    "exercises": [
+      "camp-104662-43-c-build",
+      "camp-104662-quiz-19"
+    ]
+  },
+  {
+    "figure": "camp-104662-43-d",
+    "exercises": [
+      "camp-104662-43-d-build",
+      "camp-104662-quiz-19"
+    ]
+  },
+  {
+    "figure": "camp-104662-44",
+    "exercises": [
+      "camp-104662-44-build",
+      "camp-104662-quiz-20"
+    ]
+  },
+  {
+    "figure": "camp-104662-45",
+    "exercises": [
+      "camp-104662-45-build",
+      "camp-104662-quiz-20"
+    ]
+  },
+  {
+    "figure": "camp-104662-46",
+    "exercises": [
+      "camp-104662-46-build",
+      "camp-104662-quiz-21"
+    ]
+  },
+  {
+    "figure": "camp-104662-47",
+    "exercises": [
+      "camp-104662-47-build",
+      "camp-104662-quiz-21"
+    ]
+  },
+  {
+    "figure": "camp-104662-48",
+    "exercises": [
+      "camp-104662-48-build",
+      "camp-104662-quiz-21"
+    ]
+  }
+]

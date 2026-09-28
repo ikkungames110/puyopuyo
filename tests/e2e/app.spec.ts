@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { drills } from '../../src/content';
+import { drills, practiceDrills } from '../../src/content';
 import { placements } from '../../src/engine';
 import { evaluate, makeTurn } from '../../src/sequence';
 const featured = drills.find((d) => d.id === 'next-piro-1-2')!;
@@ -36,7 +36,7 @@ test('3手のNEXT構築を実操作して8連鎖検証、記録を永続化す�
   await page.getByRole('button', { name: '練習のきろく', exact: true }).click();
   await expect(page.locator('.history-list')).toContainText(featured.title);
   await page.reload();
-  await expect(page.locator('.stat-row')).toContainText(`1 / ${drills.length}`);
+  await expect(page.locator('.stat-row')).toContainText(`1 / ${practiceDrills.length}`);
   expect(errors).toEqual([]);
 });
 test('解答例は記録せず、手順のコマ送りと再生中の画面切替ができる', async ({ page }) => {
@@ -59,7 +59,7 @@ test('解答例は記録せず、手順のコマ送りと再生中の画面切�
 test('問題集の検索・テーマ・難易度・手数・催促フィルター', async ({ page }) => {
   await page.goto('/');
   await library(page);
-  await expect(page.locator('.drill-card')).toHaveCount(drills.length);
+  await expect(page.locator('.drill-card')).toHaveCount(practiceDrills.length);
   await expect(page.locator('.drill-card')).not.toContainText(['はじめの4個消し']);
   await page.getByLabel('テーマ', { exact: true }).selectOption('潜り込み・斉藤SP');
   await expect(page.locator('.drill-card')).toHaveCount(8);

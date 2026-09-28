@@ -40,7 +40,10 @@ export function readControls(): ControlSettings {
       buttons: Object.fromEntries(
         Object.entries(defaultControls.buttons).map(([key, fallback]) => {
           const b = value.buttons?.[key];
-          return [key, Number.isInteger(b) && b >= -1 && b < 32 ? b : fallback];
+          return [
+            key,
+            Number.isInteger(b) && b >= -1 && b < 32 && (b !== 12 || key === 'drop') ? b : fallback,
+          ];
         }),
       ) as Record<Command, number>,
     };
@@ -62,11 +65,11 @@ export const keyCommands: Record<string, Command> = {
 export function gamepadCommands(pad: Pick<Gamepad, 'buttons' | 'axes'>, settings: ControlSettings) {
   const held = new Set<Command>();
   for (const [command, index] of Object.entries(settings.buttons))
-    if (index >= 0 && pad.buttons[index]?.pressed) held.add(command as Command);
+    if (index >= 0 && index !== 12 && pad.buttons[index]?.pressed) held.add(command as Command);
   if ((pad.axes[0] ?? 0) < -settings.deadzone) held.add('left');
   if ((pad.axes[0] ?? 0) > settings.deadzone) held.add('right');
   if ((pad.axes[1] ?? 0) > settings.deadzone) held.add('down');
-  // Up is deliberately unbound: pressing up on a physical pad must not rotate or drop.
+  if (pad.buttons[12]?.pressed || (pad.axes[1] ?? 0) < -settings.deadzone) held.add('drop');
   return held;
 }
 

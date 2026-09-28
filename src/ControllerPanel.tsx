@@ -49,7 +49,7 @@ export default function ControllerPanel({
         )}
         <p>
           十字キー /
-          左スティックで移動、下で落下。下を押したまま接地すると250msで確定。入力しなければ落下しません。
+          左スティックで移動、下で落下、上でハードドロップ（即設置）。下を押したまま接地すると250msで確定。入力しなければ落下しません。
         </p>
         <p>
           標準配置：下側ボタンで左回転、右側で右回転、上側で即設置、L / LBで戻す、Start /
@@ -79,8 +79,9 @@ export default function ControllerPanel({
               >
                 <option value={-1}>割り当てなし</option>
                 {Array.from({ length: 32 }, (_, i) => (
-                  <option key={i} value={i}>
+                  <option key={i} value={i} disabled={i === 12 && c !== 'drop'}>
                     B{i}
+                    {i === 12 ? '（十字キー上・即設置専用）' : ''}
                   </option>
                 ))}
               </select>

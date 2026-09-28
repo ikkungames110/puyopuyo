@@ -112,6 +112,29 @@ test('スティック・左右同時押し・同一フレームの移動と設�
   ).toBeVisible();
   await expect(page.locator('.left-side')).toContainText('2 手目');
 });
+test('十字キー上・スティック上でハードドロップし、押し続けても次の手を落とさない', async ({
+  page,
+}) => {
+  await mockPad(page);
+  await simulator(page);
+  await expect(page.locator('.controller-panel summary')).toContainText('接続中');
+  await pad(page, [12]);
+  await expect(page.locator('.left-side')).toContainText('2 手目');
+  await page.waitForTimeout(400);
+  await expect(page.locator('.left-side')).toContainText('2 手目');
+  await pad(page, []);
+  await pad(page, [], [0, -1]);
+  await expect(page.locator('.left-side')).toContainText('3 手目');
+  await page.waitForTimeout(400);
+  await expect(page.locator('.left-side')).toContainText('3 手目');
+  await pad(page, []);
+  await page.getByRole('button', { name: 'ホーム', exact: true }).click();
+  await pad(page, []);
+  await pad(page, [12]);
+  await expect(page.locator('.next-remaining')).toContainText('あと2手');
+  await page.waitForTimeout(400);
+  await expect(page.locator('.next-remaining')).toContainText('あと2手');
+});
 test('切断で入力を解除し、再接続は一度離してから受け付ける', async ({ page }) => {
   await mockPad(page);
   await simulator(page);

@@ -48,6 +48,7 @@ describe('入力の長押しとエッジ検出', () => {
     expect([...gamepadCommands({ buttons, axes: [0.1, -1] }, defaultControls)]).toEqual([
       'right',
       'ccw',
+      'drop',
     ]);
     expect([...gamepadCommands({ buttons: [], axes: [-0.8, 0.8] }, defaultControls)]).toEqual([
       'left',
@@ -55,6 +56,31 @@ describe('入力の長押しとエッジ検出', () => {
     ]);
     const config = { ...defaultControls, buttons: { ...defaultControls.buttons, ccw: -1 } };
     expect(gamepadCommands({ buttons, axes: [] }, config).has('ccw')).toBe(false);
+  });
+  it('十字キー上とスティック上は、同時入力や長押しでも一度だけハードドロップする', () => {
+    const buttons = Array.from({ length: 17 }, (_, i) => ({
+      pressed: i === 12,
+      touched: false,
+      value: i === 12 ? 1 : 0,
+    }));
+    const r = new InputRepeater();
+    const up = gamepadCommands({ buttons, axes: [0, -1] }, defaultControls);
+    expect([...up]).toEqual(['drop']);
+    const oldMapping = { ...defaultControls, buttons: { ...defaultControls.buttons, undo: 12 } };
+    expect([...gamepadCommands({ buttons, axes: [] }, oldMapping)]).toEqual(['drop']);
+    expect(r.update(up, 0, defaultControls)).toEqual(['drop']);
+    expect(r.update(up, 1000, defaultControls)).toEqual([]);
+    r.update(new Set(), 1100, defaultControls);
+    expect(
+      r.update(
+        gamepadCommands({ buttons: [], axes: [0, -1] }, defaultControls),
+        1200,
+        defaultControls,
+      ),
+    ).toEqual(['drop']);
+    expect(gamepadCommands({ buttons: [], axes: [0, -0.2] }, defaultControls).has('drop')).toBe(
+      false,
+    );
   });
 });
 describe('クイックターン', () => {

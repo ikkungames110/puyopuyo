@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "tsc -b && vite build",
-    "build:pages": "tsc -b && vite build --mode pages",
+    "build:pages": "tsc -b && npm run assets:install && vite build --mode pages",
     "preview": "vite preview --host 127.0.0.1",
     "preview:pages": "vite preview --host 127.0.0.1 --mode pages",
     "test": "vitest run",

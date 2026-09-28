@@ -1,11 +1,20 @@
 import type { Board, Pair, Resolution, Cell, Action } from './engine';
 import nextDrills from './data/next-drills.json' with { type: 'json' };
+import campDrills from './data/camp-drills.json' with { type: 'json' };
+import campQuizzes from './data/camp-quizzes.json' with { type: 'json' };
 import researchSources from './data/research-sources.json' with { type: 'json' };
 import researchVideos from './data/research-videos.json' with { type: 'json' };
 import studyNotes from './data/study-notes.json' with { type: 'json' };
 export const videos = researchVideos;
 export const sources = [
   ...researchSources,
+  {
+    id: 'camp-104662',
+    title: 'GTRの連鎖尾の組み方(主に雪崩系)',
+    author: 'ちぇすな / ぷよぷよキャンプ',
+    url: 'https://puyo-camp.jp/posts/104662',
+    note: '記事全節の図を数値盤面へ転記。右側の接続を補う35問と、失敗例・配色・仕込みを考える21問を作成。',
+  },
   {
     id: 'mid',
     title: '中盤戦術技術徹底攻略 第一部',
@@ -161,7 +170,7 @@ export const sources = [
     note: '折り返しと連鎖尾の多様な接続の完成例から、ツモと欠けた接続を設定した練習問題を作成。',
   },
 ];
-export const categories = ['すべて', '次の一手', '催促・判断', '操作の最適化'] as const;
+export const categories = ['すべて', '次の一手', '催促・判断', '操作の最適化', '形の判断'] as const;
 export type Category = (typeof categories)[number];
 type Base = {
   id: string;
@@ -172,6 +181,8 @@ type Base = {
   hint: string;
   explanation: string;
   sources: string[];
+  tags?: string[];
+  sourceFigures?: string[];
 };
 export type PlacementDrill = Base & {
   type: 'placement';
@@ -188,6 +199,9 @@ export type PlacementDrill = Base & {
 };
 export type QuizDrill = Base & {
   type: 'quiz';
+  topic: string;
+  board: Board;
+  diagrams: { id: string; label: string; board: Board }[];
   question: string;
   options: string[];
   answer: number;
@@ -207,8 +221,38 @@ export type SequenceDrill = Base & {
   attack?: { min: number; max: number; minScore: number };
 };
 export type Drill = SequenceDrill;
-export const drills: Drill[] = nextDrills as SequenceDrill[];
-export const topics = [...new Set(nextDrills.map((d) => d.topic))];
+export type PracticeDrill = SequenceDrill | QuizDrill;
+export const drills: Drill[] = [...nextDrills, ...campDrills] as SequenceDrill[];
+export const quizzes = campQuizzes as QuizDrill[];
+export const practiceDrills: PracticeDrill[] = [...drills, ...quizzes];
+export const topics = [...new Set(practiceDrills.map((d) => d.topic))];
+export function drillTags(d: PracticeDrill): string[] {
+  const text = `${d.title} ${d.topic}`;
+  return [
+    ...new Set([
+      ...(d.tags ?? []),
+      d.topic,
+      d.level,
+      ...['GTR', '雪崩', '連鎖尾', '仕込み', '鶴亀', '多重', 'だぁ積み'].filter((tag) =>
+        text.includes(tag),
+      ),
+      ...(d.type === 'sequence' && d.noSplit ? ['ちぎり0'] : []),
+    ]),
+  ];
+}
+const normalizeSearch = (value: string) => value.normalize('NFKC').toLocaleLowerCase('ja');
+export function matchesDrillSearch(d: PracticeDrill, query: string): boolean {
+  const tags = drillTags(d).map(normalizeSearch);
+  const text = normalizeSearch(
+    `${d.title} ${d.description} ${d.topic} ${tags.join(' ')} ${d.sources.map((id) => sources.find((s) => s.id === id)?.author ?? '').join(' ')}`,
+  );
+  return normalizeSearch(query)
+    .trim()
+    .split(/\s+/)
+    .every((term) =>
+      term.startsWith('#') ? term === '#' || tags.includes(term.slice(1)) : text.includes(term),
+    );
+}
 export function isCorrect(d: PlacementDrill, result: Resolution, target: Cell[], inputs: number) {
   const g = d.goal;
   return (
