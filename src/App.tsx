@@ -24,6 +24,7 @@ import Puyo, { AssetContext } from './Puyo';
 import Simulator from './Simulator';
 import NextTrainer from './NextTrainer';
 import QuizTrainer from './QuizTrainer';
+import FoundationTrainer from './FoundationTrainer';
 import StudyLibrary, { ResearchVideos, type StudySeed } from './StudyLibrary';
 import {
   categories,
@@ -191,7 +192,18 @@ export default function App() {
       matchesDrillSearch(d, search),
   );
   const renderPractice = (d: Drill) =>
-    d.type === 'quiz' ? (
+    d.type === 'foundation' ? (
+      <FoundationTrainer
+        key={`${d.id}-${session}`}
+        drill={d}
+        onAttempt={attempt}
+        onNext={next}
+        onRelated={(id) => {
+          const related = drills.find((item) => item.id === id);
+          if (related) openDrill(related);
+        }}
+      />
+    ) : d.type === 'quiz' ? (
       <QuizTrainer
         key={`${d.id}-${session}`}
         drill={d}
@@ -395,6 +407,20 @@ export default function App() {
                 </section>
                 <div className="section-heading">
                   <div>
+                    <span className="small-kicker">土台の判断</span>
+                    <h2>このツモなら、どの形へ進む？</h2>
+                    <p>GTRの上を組み始める前に、盤面とNEXTから方針を選ぶ練習。</p>
+                  </div>
+                  <button
+                    className="primary"
+                    onClick={() => openDrill(drills.find((d) => d.type === 'foundation')!)}
+                  >
+                    土台判断を始める
+                    <ArrowRight size={17} />
+                  </button>
+                </div>
+                <div className="section-heading">
+                  <div>
                     <span className="small-kicker">DAILY PRACTICE</span>
                     <h2>
                       今日の一問<span className="pill">NEXTを読んで組む</span>
@@ -511,8 +537,8 @@ export default function App() {
                   </p>
                   <div className="tag-list" aria-label="タグで検索">
                     {[
+                      '土台判断',
                       '記事n951e68d4fdb9',
-                      '最善手',
                       '記事104662',
                       'ちぇすな',
                       'GTR',
@@ -570,7 +596,7 @@ export default function App() {
                     </label>
                   </div>
                   <div className="research-summary">
-                    盤面とツモから置き方を考える配置問題と、図を比較する判断問題です。「多重折りは三種類しかない」から最大連鎖を目指す9問を追加。各問題に出典を記載しています。
+                    「土台判断」は、型を決める前の盤面とツモからGTR上の方針を選ぶ練習です。同じ盤面でもツモが違えば判断が変わります。完成形の接続を練習する配置問題は別に収録しています。
                   </div>
                   <div className="list-meta">
                     <span>{filtered.length} 件のドリル</span>
@@ -627,11 +653,21 @@ export default function App() {
                                 </div>
                                 <small>
                                   {d.attack ? '攻撃後に' : ''}
-                                  {d.objective === 'max-chains'
-                                    ? '最大連鎖を目指す'
-                                    : `${d.minChains}連鎖以上`}
-                                  {d.noSplit ? ' · ちぎり0' : ''}
+                                  {d.minChains}連鎖以上{d.noSplit ? ' · ちぎり0' : ''}
                                 </small>
+                              </>
+                            ) : d.type === 'foundation' ? (
+                              <>
+                                <span>ツモから方針を選ぶ</span>
+                                <div>
+                                  {d.queue.map((pair, i) => (
+                                    <span className="preview-pair" key={i}>
+                                      <Puyo color={pair[1]} />
+                                      <Puyo color={pair[0]} />
+                                    </span>
+                                  ))}
+                                </div>
+                                <small>型を決める前の判断</small>
                               </>
                             ) : (
                               <>

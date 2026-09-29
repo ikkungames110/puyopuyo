@@ -174,6 +174,8 @@ test('設定中は盤面を動かさず、ボタン割当と速度設定を保�
   await expect(page.locator('.left-side')).toContainText('1 手目');
   await pad(page, []);
   await page.locator('.play-toolbar').click();
+  // 設定から復帰したフレームで中立を認識させてから、新しい入力を送る。
+  await pad(page, []);
   await pad(page, [2]);
   await expect(page.locator('.active-cell')).toHaveCount(2);
   await pad(page, []);

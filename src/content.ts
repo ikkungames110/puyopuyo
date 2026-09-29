@@ -2,7 +2,7 @@ import type { Board, Pair, Resolution, Cell, Action } from './engine';
 import nextDrills from './data/next-drills.json' with { type: 'json' };
 import campDrills from './data/camp-drills.json' with { type: 'json' };
 import campQuizzes from './data/camp-quizzes.json' with { type: 'json' };
-import noteFoldDrills from './data/note-fold-drills.json' with { type: 'json' };
+import foundationData from './data/foundation-drills.json' with { type: 'json' };
 import researchSources from './data/research-sources.json' with { type: 'json' };
 import researchVideos from './data/research-videos.json' with { type: 'json' };
 import studyNotes from './data/study-notes.json' with { type: 'json' };
@@ -14,7 +14,7 @@ export const sources = [
     title: '【ぷよぷよ】多重折りは三種類しかない',
     author: 'みらいやまさると最強の生活 / note',
     url: 'https://note.com/saikyo3018/n/n951e68d4fdb9',
-    note: '折り返しの図を教材用に加工し、盤面とツモから最大連鎖を目指す9問を作成。表示ツモ内の全合法手順で最大値を検証。',
+    note: 'GTR上の型を決める前に、四色目の個数と位置から方針を選ぶ9問。同じ開始盤面でツモによる判断の違いを比較する。',
   },
   {
     id: 'camp-104662',
@@ -216,7 +216,6 @@ export type QuizDrill = Base & {
 };
 export type SequenceDrill = Base & {
   type: 'sequence';
-  objective?: 'max-chains';
   topic: string;
   board: Board;
   queue: Pair[];
@@ -230,10 +229,25 @@ export type SequenceDrill = Base & {
   attack?: { min: number; max: number; minScore: number };
 };
 export type Drill = SequenceDrill;
-export type PracticeDrill = SequenceDrill | QuizDrill;
-export const drills: Drill[] = [...nextDrills, ...campDrills, ...noteFoldDrills] as SequenceDrill[];
+export type FoundationDrill = Base & {
+  type: 'foundation';
+  topic: string;
+  board: Board;
+  queue: Pair[];
+  options: {
+    id: string;
+    label: string;
+    recommended: boolean;
+    reason: string;
+    witness?: Action[][];
+  }[];
+  related: string[];
+};
+export type PracticeDrill = SequenceDrill | QuizDrill | FoundationDrill;
+export const drills: Drill[] = [...nextDrills, ...campDrills] as SequenceDrill[];
 export const quizzes = campQuizzes as QuizDrill[];
-export const practiceDrills: PracticeDrill[] = [...drills, ...quizzes];
+export const foundations = foundationData as FoundationDrill[];
+export const practiceDrills: PracticeDrill[] = [...foundations, ...drills, ...quizzes];
 export const topics = [...new Set(practiceDrills.map((d) => d.topic))];
 export function drillTags(d: PracticeDrill): string[] {
   const text = `${d.title} ${d.topic}`;

@@ -313,7 +313,6 @@ export default function NextTrainer({
       <div className="next-task-panel">
         <div className="task-tags">
           <span>次の一手</span>
-          {d.objective === 'max-chains' && <span>最善手問題</span>}
           <span>{d.level}</span>
           {d.noSplit && <span>ちぎり0回</span>}
           {d.attack && <span>本線温存</span>}
@@ -321,23 +320,13 @@ export default function NextTrainer({
         <h2>{d.title}</h2>
         <p className="next-objective">{d.description}</p>
         <div className="next-rules">
-          <strong>
-            {d.objective === 'max-chains'
-              ? 'このツモでの最大連鎖を目指す'
-              : d.attack
-                ? '短い攻撃 ＋ 本線の残し'
-                : '構築 → 発火の接続を確認'}
-          </strong>
+          <strong>{d.attack ? '短い攻撃 ＋ 本線の残し' : '構築 → 発火の接続を確認'}</strong>
           <p>
             {d.attack
               ? `最後の手以外では消さずに組んでください。攻撃後の盤面を確認ツモで検証します。`
               : `構築用の${d.queue.length}手を置いてください。確認ツモはその後の仮想ツモで、最も長くつながる置き方を自動で調べます。`}
           </p>
-          <small>
-            {d.objective === 'max-chains'
-              ? '最善の基準は、構築中に消さず、表示ツモから作れる連鎖数が最大になること。同じ最大連鎖に届く別解も正解です。未知のツモや対戦相手は評価に含めません。'
-              : '条件を満たす別解も正解。最善の対戦手順を一意に決める問題ではありません。'}
-          </small>
+          <small>条件を満たす別解も正解。最善の対戦手順を一意に決める問題ではありません。</small>
         </div>
         <button
           className="primary check-answer"
@@ -366,18 +355,11 @@ export default function NextTrainer({
             className={`next-feedback ${report.correct ? 'correct' : 'incorrect'}`}
             role="status"
           >
-            <h3>
-              {report.correct
-                ? d.objective === 'max-chains'
-                  ? '正解：このツモでの最大連鎖'
-                  : '正解：接続条件を達成'
-                : '配置を見直してみよう'}
-            </h3>
+            <h3>{report.correct ? '正解：接続条件を達成' : '配置を見直してみよう'}</h3>
             <p>
               接続検証 {report.probe?.result.chains ?? 0} / {d.minChains}連鎖 · ちぎり
               {report.splitCount}回 · {report.inputs}入力
             </p>
-            {d.objective === 'max-chains' && <p>全合法手順で検証した最大値：{d.minChains}連鎖</p>}
             {!!report.reasons.length && (
               <ul>
                 {report.reasons.map((r) => (
@@ -438,11 +420,6 @@ export default function NextTrainer({
             {d.origin}
             を参照し、接続に必要なぷよを抜いて配ぷよと手順を設定した派生課題です。催促問題は元の形から部分発火の条件を設定しています。判定条件と解説は本サイトで作成しました。
           </p>
-          {d.objective === 'max-chains' && (
-            <p>
-              記事の折り返しを数値化し、右側の土台とツモを教材用に設定しました。灰色は省略記号ではなく、実際に消去・落下するおじゃまぷよとして扱います。最大値は構築用ツモと接続確認ツモの全到達可能配置を調べた結果です。
-            </p>
-          )}
         </details>
         <SourceLinks ids={d.sources} />
       </div>
