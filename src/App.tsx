@@ -511,6 +511,8 @@ export default function App() {
                   </p>
                   <div className="tag-list" aria-label="タグで検索">
                     {[
+                      '記事n951e68d4fdb9',
+                      '最善手',
                       '記事104662',
                       'ちぇすな',
                       'GTR',
@@ -568,7 +570,7 @@ export default function App() {
                     </label>
                   </div>
                   <div className="research-summary">
-                    攻略記事・動画の完成例から作成した配置問題と判断問題です。ちぇすなさんの記事は全節を56問にまとめています。各問題に出典を記載しています。
+                    盤面とツモから置き方を考える配置問題と、図を比較する判断問題です。「多重折りは三種類しかない」から最大連鎖を目指す9問を追加。各問題に出典を記載しています。
                   </div>
                   <div className="list-meta">
                     <span>{filtered.length} 件のドリル</span>
@@ -625,7 +627,10 @@ export default function App() {
                                 </div>
                                 <small>
                                   {d.attack ? '攻撃後に' : ''}
-                                  {d.minChains}連鎖以上{d.noSplit ? ' · ちぎり0' : ''}
+                                  {d.objective === 'max-chains'
+                                    ? '最大連鎖を目指す'
+                                    : `${d.minChains}連鎖以上`}
+                                  {d.noSplit ? ' · ちぎり0' : ''}
                                 </small>
                               </>
                             ) : (
